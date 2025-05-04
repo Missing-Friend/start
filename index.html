@@ -8,7 +8,6 @@
 </head>
 <body>
   <div id="game-container">
-    <!-- Info button top right -->
     <button id="info-button" title="Show gathered info">ℹ️</button>
 
     <header>
@@ -16,29 +15,21 @@
       <p>A Mystery Crime Game</p>
     </header>
 
-    <!-- Current character display -->
     <div id="current-character" style="font-style: italic; margin-bottom: 1rem; color: #ccc;"></div>
 
-    <!-- Main game text and choices -->
-    <section id="game-screen">
-      <!-- Dynamic content inserted here -->
-    </section>
+    <section id="game-screen"></section>
 
     <footer>
       <p>© 2025 Ducks Pond Games</p>
     </footer>
   </div>
 
-  <!-- Info panel (hidden by default) -->
   <div id="info-panel" style="display:none;">
     <h2>Gathered Information</h2>
-    <div id="info-content">
-      <!-- Info content filled by JS -->
-    </div>
+    <div id="info-content"></div>
     <button id="close-info">Close</button>
   </div>
 
-  <!-- Script -->
   <script src="script.js"></script>
 </body>
 </html>
