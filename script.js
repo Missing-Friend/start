@@ -92,6 +92,7 @@ function showDiary() {
       pageText.style.color = '#a33';
       pageText.textContent = '--- Page ripped out ---';
       nextArrow.style.display = 'none';
+      currentPage++;
     }
   };
 
