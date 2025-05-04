@@ -8,18 +8,30 @@
 </head>
 <body>
   <div id="game-container">
+    <button id="info-button" title="Show gathered info">ℹ️</button>
+
     <header>
       <h1>Missing</h1>
       <p>A Mystery Crime Game</p>
     </header>
 
+    <div id="current-character" style="font-style: italic; margin-bottom: 1rem; color: #ccc;"></div>
+
     <section id="game-screen">
-      <!-- Game content will go here -->
+      <!-- Game content will be inserted here -->
     </section>
 
     <footer>
-      <p>© 2025 Arlington Mystery Games</p>
+      <p>© 2025 Ducks Pond Games</p>
     </footer>
+  </div>
+
+  <div id="info-panel" style="display:none;">
+    <h2>Gathered Information</h2>
+    <div id="info-content">
+      <!-- Info will be inserted here -->
+    </div>
+    <button id="close-info">Close</button>
   </div>
 
   <script src="script.js"></script>
