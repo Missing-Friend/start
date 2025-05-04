@@ -14,7 +14,6 @@ let gatheredInfo = {
 };
 
 let introducedCharacters = new Set();
-let visitedLocations = new Set(['Your House']); // Start with Your House unlocked
 let currentSceneKey = null;
 let historyStack = [];
 
@@ -41,7 +40,6 @@ const diaryPages = [
 ];
 
 // --- Utility Functions ---
-
 function addClue(clue) {
   if (!gatheredInfo.clues.includes(clue)) gatheredInfo.clues.push(clue);
 }
@@ -110,9 +108,8 @@ const characterInfoMap = {
 // --- Phone Call UI Elements ---
 let phoneUI = null;
 
-// Create phone UI on demand
 function createPhoneUI() {
-  if (phoneUI) return; // Already exists
+  if (phoneUI) return;
 
   phoneUI = document.createElement('div');
   phoneUI.id = 'phone-ui';
@@ -134,7 +131,6 @@ function createPhoneUI() {
     padding: 10px;
   `;
 
-  // Calling text
   const callingText = document.createElement('div');
   callingText.id = 'calling-text';
   callingText.style = `
@@ -145,7 +141,6 @@ function createPhoneUI() {
   `;
   phoneUI.appendChild(callingText);
 
-  // Dialogue container
   const dialogueContainer = document.createElement('div');
   dialogueContainer.id = 'dialogue-container';
   dialogueContainer.style = `
@@ -160,7 +155,6 @@ function createPhoneUI() {
   `;
   phoneUI.appendChild(dialogueContainer);
 
-  // Questions container
   const questionsContainer = document.createElement('div');
   questionsContainer.id = 'questions-container';
   questionsContainer.style = `
@@ -171,7 +165,6 @@ function createPhoneUI() {
   `;
   phoneUI.appendChild(questionsContainer);
 
-  // Hang up button
   const hangupBtn = document.createElement('button');
   hangupBtn.textContent = 'Hang Up';
   hangupBtn.style = `
@@ -194,7 +187,6 @@ function createPhoneUI() {
   document.body.appendChild(phoneUI);
 }
 
-// Show phone UI with slide up animation
 function showPhoneUI(personName) {
   createPhoneUI();
   phoneUI.style.bottom = '20px';
@@ -209,14 +201,12 @@ function showPhoneUI(personName) {
   dialogueContainer.innerHTML = '';
   questionsContainer.innerHTML = '';
 
-  // After short delay, simulate call answered and show questions
   setTimeout(() => {
     callingText.textContent = `${personName} is on the line.`;
     loadCallQuestions(personName);
   }, 1500);
 }
 
-// Hide phone UI with slide down animation
 function hidePhoneUI() {
   if (!phoneUI) return;
   phoneUI.style.bottom = '-300px';
@@ -224,20 +214,16 @@ function hidePhoneUI() {
   currentCallPerson = null;
 }
 
-// End call handler
 function endCall() {
   hidePhoneUI();
-  // Return to main investigation screen (no scene change)
 }
 
-// Load questions for a person based on clues and context
 function loadCallQuestions(personName) {
   const questionsContainer = document.getElementById('questions-container');
   const dialogueContainer = document.getElementById('dialogue-container');
   questionsContainer.innerHTML = '';
   dialogueContainer.innerHTML = '';
 
-  // Example questions per person - expand as you like
   const questionsMap = {
     'Kaylee': [
       {
@@ -324,7 +310,6 @@ function loadCallQuestions(personName) {
     btn.onmouseleave = () => btn.style.backgroundColor = '#222';
 
     btn.onclick = () => {
-      // Show answer in dialogue container
       dialogueContainer.textContent = a || 'No response.';
     };
 
@@ -471,7 +456,6 @@ function showDiary() {
       nextArrow.style.display = 'none';
       currentPage++;
 
-      // Unlock page pieces mechanic and new objective
       addNote('Josh\'s diary has a ripped page. You need to find the pieces.');
       unlockPagePiecesMechanic();
     }
@@ -506,7 +490,6 @@ function showDiary() {
   document.body.appendChild(overlay);
 }
 
-// Fade new objective text
 function fadeNewObjective(text) {
   const objBox = document.createElement('div');
   objBox.textContent = text;
@@ -543,11 +526,9 @@ function unlockPagePiecesMechanic() {
   if (pagePiecesUnlocked) return;
   pagePiecesUnlocked = true;
 
-  // Add new places related to page pieces
   addPlace("Josh's House");
   addPlace("Park");
 
-  // Enable Check Back mechanic (phone calls)
   enableCheckBackMechanic();
 }
 
@@ -558,15 +539,13 @@ function enableCheckBackMechanic() {
   if (checkBackEnabled) return;
   checkBackEnabled = true;
 
-  // Show UI for person icons to call (we'll create it dynamically)
   createPersonIconsUI();
 }
 
-// Create person icons UI for calling
 let personIconsUI = null;
 
 function createPersonIconsUI() {
-  if (personIconsUI) return; // Already created
+  if (personIconsUI) return;
 
   personIconsUI = document.createElement('div');
   personIconsUI.id = 'person-icons-ui';
@@ -589,16 +568,15 @@ function createPersonIconsUI() {
   updatePersonIcons();
 }
 
-// Update person icons based on people met
 function updatePersonIcons() {
   if (!personIconsUI) return;
   personIconsUI.innerHTML = '';
 
   peopleMet.forEach(person => {
-    if (person === 'Philip') return; // Don't show self
+    if (person === 'Philip') return;
 
     const iconBtn = document.createElement('button');
-    iconBtn.textContent = person[0]; // First letter as icon
+    iconBtn.textContent = person[0];
     iconBtn.title = person;
     iconBtn.style = `
       width: 40px;
@@ -616,7 +594,7 @@ function updatePersonIcons() {
     iconBtn.onmouseleave = () => iconBtn.style.backgroundColor = '#222';
 
     iconBtn.onclick = () => {
-      if (phoneActive) return; // Prevent multiple calls
+      if (phoneActive) return;
       showPhoneUI(person);
     };
 
@@ -624,9 +602,7 @@ function updatePersonIcons() {
   });
 }
 
-// --- History and Go Back ---
-
-// Declare backButton once at top
+// --- Go Back Button ---
 let backButton = null;
 
 function createBackButton() {
@@ -645,11 +621,8 @@ function goBack() {
   showScene(prevScene, false);
 }
 
-// --- Main Scene Logic ---
-
-// Scenes object with locations, clues, suspects, diary, and branching
+// --- Scenes ---
 const scenes = {
-  // Starting scene at Your House
   'start': {
     character: 'Philip',
     location: 'Your House',
@@ -664,48 +637,305 @@ const scenes = {
       addPersonMet('Philip');
     }
   },
-
-  // ... (Include all other scenes exactly as in the previous full code) ...
-
-  // For brevity, you should include all scenes from the previous full code here.
+  'checkPhone': {
+    character: 'Philip',
+    location: 'Your House',
+    text: `Your phone shows no new messages from Josh. You feel uneasy.`,
+    choices: [
+      { text: "Go to Josh's House", next: "joshsHouse" },
+      { text: "Wait a little longer", next: "waitLonger" }
+    ]
+  },
+  'waitLonger': {
+    character: 'Philip',
+    location: 'Your House',
+    text: `You wait, but still no word from Josh. The rain keeps falling.`,
+    choices: [
+      { text: "Go to Josh's House", next: "joshsHouse" }
+    ]
+  },
+  'joshsHouse': {
+    character: "Josh's Brother",
+    location: "Josh's House",
+    text: `You arrive at Josh's house. His brother answers the door and says Josh never came home.`,
+    choices: [
+      { text: "Ask about Josh's friends", next: "askFriends" },
+      { text: "Check Josh's social media", next: "checkSocial" },
+      { text: "Search Josh's room", next: "searchJoshRoom" }
+    ],
+    onEnter: () => {
+      addPlace("Josh's House");
+      addPersonMet("Josh's Brother");
+    }
+  },
+  'askFriends': {
+    character: "Josh's Brother",
+    location: "Josh's House",
+    text: `Josh's brother mentions Nate and Aliya. Maybe they know something.`,
+    choices: [
+      { text: "Look up Nate's last messages", next: "checkNate" },
+      { text: "Look up Aliya's posts", next: "checkAliya" },
+      { text: "Go back", next: "joshsHouse" }
+    ]
+  },
+  'checkSocial': {
+    character: 'Philip',
+    location: "Josh's House",
+    text: `Josh's social media shows a cryptic post from earlier today: "Don't trust anyone."`,
+    choices: [
+      { text: "Investigate further", next: "investigateFurther" },
+      { text: "Go back", next: "joshsHouse" }
+    ]
+  },
+  'checkNate': {
+    character: 'Nate',
+    location: 'Unknown',
+    text: `Nate's last message to Josh was a joke about meeting up tomorrow. Nothing suspicious.`,
+    choices: [
+      { text: "Check Aliya's posts", next: "checkAliya" },
+      { text: "Go back", next: "askFriends" }
+    ],
+    onEnter: () => {
+      addSuspect('Nate');
+      addPersonMet('Nate');
+      addClue("Nate's last message was a joke, no threat detected.");
+    }
+  },
+  'checkAliya': {
+    character: 'Aliya',
+    location: 'Unknown',
+    text: `Aliya posted a photo with Josh two days ago with the caption: "Missing you already."`,
+    choices: [
+      { text: "Look for more posts", next: "moreAliya" },
+      { text: "Go back", next: "askFriends" }
+    ],
+    onEnter: () => {
+      addSuspect('Aliya');
+      addPersonMet('Aliya');
+      addClue("Aliya's social media shows affection towards Josh.");
+    }
+  },
+  'moreAliya': {
+    character: 'Aliya',
+    location: 'Unknown',
+    text: `A recent post shows Aliya arguing with Josh in a comment thread. Tensions might be higher than they seem.`,
+    choices: [
+      { text: "Go back", next: "checkAliya" }
+    ],
+    onEnter: () => {
+      addNote("Aliya and Josh had a recent argument on social media.");
+    }
+  },
+  'investigateFurther': {
+    character: 'Philip',
+    location: 'Your House',
+    text: `You decide to dig deeper into Josh's online activity and diary entries.`,
+    choices: [
+      { text: "Check Josh's diary", next: "checkDiary" },
+      { text: "Look up Josh's last location", next: "checkLocation" },
+      { text: "Go back", next: "checkSocial" }
+    ]
+  },
+  'checkDiary': {
+    character: 'Philip',
+    location: 'Your House',
+    text: `Josh's diary is here. You can read it.`,
+    diary: true,
+    choices: [
+      { text: "Go back", next: "investigateFurther" }
+    ],
+    onEnter: () => {
+      addClue("Josh's diary might hold important information.");
+    }
+  },
+  'checkLocation': {
+    character: 'Philip',
+    location: 'Your House',
+    text: `Josh's location tracker last pinged near the park, close to where you were earlier.`,
+    choices: [
+      { text: "Go back", next: "investigateFurther" }
+    ],
+    onEnter: () => {
+      addClue("Josh's last known location was near the park.");
+      addPlace('Park');
+    }
+  },
+  'park': {
+    character: 'Philip',
+    location: 'Park',
+    text: `You arrive at the park where you last saw Josh. The fog and rain make everything look eerie.`,
+    choices: [
+      { text: "Look around the park", next: "lookAroundPark" },
+      { text: "Go back to Your House", next: "start" }
+    ],
+    onEnter: () => {
+      addPlace('Park');
+    }
+  },
+  'lookAroundPark': {
+    character: 'Philip',
+    location: 'Park',
+    text: `You find some torn pieces of paper near a bench. Could these be from Josh's diary?`,
+    choices: [
+      { text: "Collect torn pieces", next: "collectPiecesPark" },
+      { text: "Go back", next: "park" }
+    ],
+    onEnter: () => {
+      addClue("Found torn diary pieces at the park.");
+    }
+  },
+  'collectPiecesPark': {
+    character: 'Philip',
+    location: 'Park',
+    text: `You collect the torn pieces. They might help you understand what Josh was scared of.`,
+    choices: [
+      { text: "Go back to Josh's House", next: "joshsHouse" },
+      { text: "Go back to Your House", next: "start" }
+    ],
+    onEnter: () => {
+      addNote("Collected diary pieces from the park.");
+      addPlace("Josh's House");
+    }
+  },
+  'searchJoshRoom': {
+    character: 'Philip',
+    location: "Josh's House",
+    text: `You search Josh's room carefully. You find torn diary pieces under his bed and in his closet.`,
+    choices: [
+      { text: "Look under the bed", next: "underBed" },
+      { text: "Look in the closet", next: "inCloset" },
+      { text: "Go back to Josh's House entrance", next: "joshsHouse" }
+    ],
+    onEnter: () => {
+      addClue("Searching Josh's room for diary pieces.");
+    }
+  },
+  'underBed': {
+    character: 'Philip',
+    location: "Josh's House",
+    text: `Under the bed, you find several torn pieces of the diary page.`,
+    choices: [
+      { text: "Take the pieces", next: "takePiecesUnderBed" },
+      { text: "Go back to searching room", next: "searchJoshRoom" }
+    ],
+    onEnter: () => {
+      addNote("Found diary pieces under Josh's bed.");
+    }
+  },
+  'takePiecesUnderBed': {
+    character: 'Philip',
+    location: "Josh's House",
+    text: `You take the torn pieces from under the bed and put them in your pocket.`,
+    choices: [
+      { text: "Continue searching the room", next: "searchJoshRoom" },
+      { text: "Go back to Josh's House entrance", next: "joshsHouse" }
+    ],
+    onEnter: () => {
+      addNote("Collected diary pieces from under the bed.");
+    }
+  },
+  'inCloset': {
+    character: 'Philip',
+    location: "Josh's House",
+    text: `In the closet, you find more torn diary pieces, hidden behind some clothes.`,
+    choices: [
+      { text: "Take the pieces", next: "takePiecesInCloset" },
+      { text: "Go back to searching room", next: "searchJoshRoom" }
+    ],
+    onEnter: () => {
+      addNote("Found diary pieces in Josh's closet.");
+    }
+  },
+  'takePiecesInCloset': {
+    character: 'Philip',
+    location: "Josh's House",
+    text: `You take the torn pieces from the closet.`,
+    choices: [
+      { text: "Continue searching the room", next: "searchJoshRoom" },
+      { text: "Go back to Josh's House entrance", next: "joshsHouse" }
+    ],
+    onEnter: () => {
+      addNote("Collected diary pieces from the closet.");
+    }
+  },
+  'talkKaylee': {
+    character: 'Kaylee',
+    location: 'Josh\'s House',
+    text: `Kaylee looks worried but admits she has some of the diary page pieces. She says she took them to protect Josh.`,
+    choices: [
+      { text: "Ask about Nicholas", next: "talkNicholas" },
+      { text: "Ask about Lily and Bri", next: "talkSisters" },
+      { text: "Go back to Josh's House", next: "joshsHouse" }
+    ],
+    onEnter: () => {
+      addSuspect('Kaylee');
+      addPersonMet('Kaylee');
+      addNote("Kaylee has some diary page pieces.");
+    }
+  },
+  'talkNicholas': {
+    character: 'Nicholas',
+    location: 'Josh\'s House',
+    text: `Nicholas is evasive but admits to having some diary fragments. He seems nervous.`,
+    choices: [
+      { text: "Ask about Kaylee", next: "talkKaylee" },
+      { text: "Ask about Lily and Bri", next: "talkSisters" },
+      { text: "Go back to Josh's House", next: "joshsHouse" }
+    ],
+    onEnter: () => {
+      addSuspect('Nicholas');
+      addPersonMet('Nicholas');
+      addNote("Nicholas is hiding diary fragments.");
+    }
+  },
+  'talkSisters': {
+    character: 'Lily & Bri',
+    location: 'Josh\'s House',
+    text: `Lily and Bri giggle and admit they took some torn diary pages and hid them in Josh's closet.`,
+    choices: [
+      { text: "Ask about Kaylee", next: "talkKaylee" },
+      { text: "Ask about Nicholas", next: "talkNicholas" },
+      { text: "Go back to Josh's House", next: "joshsHouse" }
+    ],
+    onEnter: () => {
+      addSuspect('Lily');
+      addSuspect('Bri');
+      addPersonMet('Lily');
+      addPersonMet('Bri');
+      addNote("Lily and Bri have some torn diary pages.");
+    }
+  }
 };
 
 // --- Show Scene Function ---
 function showScene(sceneKey, pushToHistory = true) {
   const scene = scenes[sceneKey];
   if (!scene) {
-    gameScreen.innerHTML = `<p>Scene "${sceneKey}" not found.</p>`;
+    console.error(`Scene "${sceneKey}" not found.`);
+    gameScreen.innerHTML = `<p>Scene "${sceneKey}" Not Found</p>`;
     currentCharacterDiv.textContent = '';
     return;
   }
 
-  // Push current scene to history if needed
   if (currentSceneKey && currentSceneKey !== sceneKey && pushToHistory) {
     historyStack.push(currentSceneKey);
   }
   currentSceneKey = sceneKey;
 
-  // Run onEnter if exists
   if (scene.onEnter) scene.onEnter();
 
-  // Introduce character if first time
   if (scene.character) showCharacterIntro(scene.character);
 
-  // Update current character display
   updateCurrentCharacter(scene.character);
 
-  // Clear game screen
   gameScreen.innerHTML = '';
 
-  // Show location selector if places unlocked
   showLocationSelector();
 
-  // Scene text
   const sceneText = document.createElement('p');
   sceneText.textContent = scene.text;
   gameScreen.appendChild(sceneText);
 
-  // Diary button if available
   if (scene.diary) {
     const diaryBtn = document.createElement('button');
     diaryBtn.textContent = 'Read Josh\'s Diary';
@@ -713,17 +943,14 @@ function showScene(sceneKey, pushToHistory = true) {
     gameScreen.appendChild(diaryBtn);
   }
 
-  // Button container for choices and back button
   const buttonContainer = document.createElement('div');
   buttonContainer.style.marginTop = '1rem';
 
-  // Go Back button if history available
   createBackButton();
   if (historyStack.length > 0) {
     buttonContainer.appendChild(backButton);
   }
 
-  // Add choices buttons
   scene.choices.forEach(choice => {
     const btn = document.createElement('button');
     btn.textContent = choice.text;
@@ -776,7 +1003,6 @@ function showLocationSelector() {
     btn.onclick = () => {
       if (place === currentLocation) return;
       currentLocation = place;
-      // Show a scene corresponding to the location
       switch (place) {
         case 'Your House': showScene('start'); break;
         case "Josh's House": showScene('joshsHouse'); break;
@@ -786,6 +1012,25 @@ function showLocationSelector() {
     };
     locationSelector.appendChild(btn);
   });
+}
+
+// --- Back Button ---
+let backButton = null;
+
+function createBackButton() {
+  if (!backButton) {
+    backButton = document.createElement('button');
+    backButton.textContent = 'Go Back';
+    backButton.style.marginRight = '10px';
+    backButton.onclick = goBack;
+  }
+}
+
+function goBack() {
+  if (historyStack.length === 0) return;
+  const prevScene = historyStack.pop();
+  currentSceneKey = null;
+  showScene(prevScene, false);
 }
 
 // --- Start Game ---
