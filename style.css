@@ -209,6 +209,7 @@ header, footer {
 #diary-book button {
   position: absolute;
   bottom: 20px;
+  right: 30px;
   font-size: 2rem;
   background: none;
   border: none;
