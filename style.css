@@ -1,4 +1,8 @@
-/* Body and container styling */
+/* Reset and base */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -112,4 +116,122 @@ header, footer {
 
 #game-screen button:hover {
   background-color: #555;
+}
+
+/* Location selector buttons */
+#location-selector button {
+  background-color: #222;
+  color: #afa;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+#location-selector button:hover {
+  background-color: #6a6;
+}
+
+#location-selector button[style*="background-color: rgb(74, 164, 74)"] {
+  /* Selected location button */
+  background-color: #4a4 !important;
+}
+
+/* Phone UI styles */
+#phone-ui {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#phone-ui button {
+  background-color: #222;
+  color: #afa;
+  border: 1px solid #4a4;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex-grow: 1;
+  min-width: 140px;
+  transition: background-color 0.3s ease;
+}
+
+#phone-ui button:hover {
+  background-color: #4a4;
+}
+
+/* Person icons UI */
+#person-icons-ui button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #4a4;
+  background-color: #222;
+  color: #afa;
+  font-weight: 700;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#person-icons-ui button:hover {
+  background-color: #4a4;
+}
+
+/* Diary overlay and book */
+#diary-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.85);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 3000;
+}
+
+#diary-book {
+  background: #f9f5e3;
+  color: #222;
+  width: 600px;
+  max-width: 90vw;
+  height: 400px;
+  padding: 30px 40px;
+  box-shadow: 0 0 20px #000;
+  border-radius: 15px;
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  position: relative;
+  white-space: pre-wrap;
+  overflow-y: auto;
+}
+
+#diary-book button {
+  position: absolute;
+  bottom: 20px;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #444;
+  transition: color 0.3s ease;
+}
+
+#diary-book button:hover {
+  color: #000;
+}
+
+#diary-book button.close-btn {
+  left: 30px;
+  font-size: 1rem;
+  padding: 6px 14px;
+  border-radius: 5px;
+  background-color: #444;
+  color: #eee;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#diary-book button.close-btn:hover {
+  background-color: #666;
 }
