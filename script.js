@@ -1075,9 +1075,10 @@ function showLocationSelector() {
   });
 }
 
-// --- Back Button Creation ---
+// Declare once at top
 let backButton = null;
 
+// Later inside a function, assign it without redeclaration
 function createBackButton() {
   if (!backButton) {
     backButton = document.createElement('button');
@@ -1086,6 +1087,7 @@ function createBackButton() {
     backButton.onclick = goBack;
   }
 }
+
 
 function goBack() {
   if (historyStack.length === 0) return;
