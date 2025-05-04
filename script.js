@@ -93,9 +93,15 @@
 
   // --- Show scene ---
   function showScene(sceneKey, pushToHistory = true) {
+    if (!sceneKey) {
+      console.error("Invalid scene key:", sceneKey);
+      gameScreen.innerHTML = `<p>Invalid scene key.</p>`;
+      currentCharacterDiv.textContent = '';
+      return;
+    }
     const scene = scenes[sceneKey];
     if (!scene) {
-      console.error(`Scene "${sceneKey}" not found.`);
+      console.error(`Scene "${sceneKey}" Not Found`);
       gameScreen.innerHTML = `<p>Scene "${sceneKey}" Not Found</p>`;
       currentCharacterDiv.textContent = '';
       return;
@@ -580,6 +586,244 @@
     });
   }
 
-  // Start the game
+  // --- Scenes object ---
+  const scenes = {
+    'start': {
+      character: 'Philip',
+      location: 'Your House',
+      text: `It’s a foggy, rainy evening in Arlington. You and your friend Josh just left the park. You ask him to text you when he gets home, but hours pass with no message.`,
+      choices: [
+        { text: "Check your phone for messages", next: "checkPhone" },
+        { text: "Go to Josh's House", next: "joshsHouse" },
+        { text: "Go to the Park", next: "park" }
+      ],
+      onEnter: () => { addPlace('Your House'); addPersonMet('Philip'); }
+    },
+    'checkPhone': {
+      character: 'Philip',
+      location: 'Your House',
+      text: `Your phone shows no new messages from Josh. You feel uneasy.`,
+      choices: [
+        { text: "Go to Josh's House", next: "joshsHouse" },
+        { text: "Wait a little longer", next: "waitLonger" }
+      ]
+    },
+    'waitLonger': {
+      character: 'Philip',
+      location: 'Your House',
+      text: `You wait, but still no word from Josh. The rain keeps falling.`,
+      choices: [
+        { text: "Go to Josh's House", next: "joshsHouse" }
+      ]
+    },
+    'joshsHouse': {
+      character: "Josh's Brother",
+      location: "Josh's House",
+      text: `You arrive at Josh's house. His brother answers the door and says Josh never came home.`,
+      choices: [
+        { text: "Ask about Josh's friends", next: "askFriends" },
+        { text: "Check Josh's social media", next: "checkSocial" },
+        { text: "Search Josh's room", next: "searchJoshRoom" }
+      ],
+      onEnter: () => { addPlace("Josh's House"); addPersonMet("Josh's Brother"); }
+    },
+    'askFriends': {
+      character: "Josh's Brother",
+      location: "Josh's House",
+      text: `Josh's brother mentions Nate and Aliya. Maybe they know something.`,
+      choices: [
+        { text: "Look up Nate's last messages", next: "checkNate" },
+        { text: "Look up Aliya's posts", next: "checkAliya" },
+        { text: "Go back", next: "joshsHouse" }
+      ]
+    },
+    'checkSocial': {
+      character: 'Philip',
+      location: "Josh's House",
+      text: `Josh's social media shows a cryptic post from earlier today: "Don't trust anyone."`,
+      choices: [
+        { text: "Investigate further", next: "investigateFurther" },
+        { text: "Go back", next: "joshsHouse" }
+      ]
+    },
+    'checkNate': {
+      character: 'Nate',
+      location: 'Unknown',
+      text: `Nate's last message to Josh was a joke about meeting up tomorrow. Nothing suspicious.`,
+      choices: [
+        { text: "Check Aliya's posts", next: "checkAliya" },
+        { text: "Go back", next: "askFriends" }
+      ],
+      onEnter: () => { addSuspect('Nate'); addPersonMet('Nate'); addClue("Nate's last message was a joke, no threat detected."); }
+    },
+    'checkAliya': {
+      character: 'Aliya',
+      location: 'Unknown',
+      text: `Aliya posted a photo with Josh two days ago with the caption: "Missing you already."`,
+      choices: [
+        { text: "Look for more posts", next: "moreAliya" },
+        { text: "Go back", next: "askFriends" }
+      ],
+      onEnter: () => { addSuspect('Aliya'); addPersonMet('Aliya'); addClue("Aliya's social media shows affection towards Josh."); }
+    },
+    'moreAliya': {
+      character: 'Aliya',
+      location: 'Unknown',
+      text: `A recent post shows Aliya arguing with Josh in a comment thread. Tensions might be higher than they seem.`,
+      choices: [
+        { text: "Go back", next: "checkAliya" }
+      ],
+      onEnter: () => { addNote("Aliya and Josh had a recent argument on social media."); }
+    },
+    'investigateFurther': {
+      character: 'Philip',
+      location: 'Your House',
+      text: `You decide to dig deeper into Josh's online activity and diary entries.`,
+      choices: [
+        { text: "Check Josh's diary", next: "checkDiary" },
+        { text: "Look up Josh's last location", next: "checkLocation" },
+        { text: "Go back", next: "checkSocial" }
+      ]
+    },
+    'checkDiary': {
+      character: 'Philip',
+      location: 'Your House',
+      text: `Josh's diary is here. You can read it.`,
+      diary: true,
+      choices: [
+        { text: "Go back", next: "investigateFurther" }
+      ],
+      onEnter: () => { addClue("Josh's diary might hold important information."); }
+    },
+    'checkLocation': {
+      character: 'Philip',
+      location: 'Your House',
+      text: `Josh's location tracker last pinged near the park, close to where you were earlier.`,
+      choices: [
+        { text: "Go back", next: "investigateFurther" }
+      ],
+      onEnter: () => { addClue("Josh's last known location was near the park."); addPlace('Park'); }
+    },
+    'park': {
+      character: 'Philip',
+      location: 'Park',
+      text: `You arrive at the park where you last saw Josh. The fog and rain make everything look eerie.`,
+      choices: [
+        { text: "Look around the park", next: "lookAroundPark" },
+        { text: "Go back to Your House", next: "start" }
+      ],
+      onEnter: () => { addPlace('Park'); }
+    },
+    'lookAroundPark': {
+      character: 'Philip',
+      location: 'Park',
+      text: `You find some torn pieces of paper near a bench. Could these be from Josh's diary?`,
+      choices: [
+        { text: "Collect torn pieces", next: "collectPiecesPark" },
+        { text: "Go back", next: "park" }
+      ],
+      onEnter: () => { addClue("Found torn diary pieces at the park."); }
+    },
+    'collectPiecesPark': {
+      character: 'Philip',
+      location: 'Park',
+      text: `You collect the torn pieces. They might help you understand what Josh was scared of.`,
+      choices: [
+        { text: "Go back to Josh's House", next: "joshsHouse" },
+        { text: "Go back to Your House", next: "start" }
+      ],
+      onEnter: () => { addNote("Collected diary pieces from the park."); addPlace("Josh's House"); }
+    },
+    'searchJoshRoom': {
+      character: 'Philip',
+      location: "Josh's House",
+      text: `You search Josh's room carefully. You find torn diary pieces under his bed and in his closet.`,
+      choices: [
+        { text: "Look under the bed", next: "underBed" },
+        { text: "Look in the closet", next: "inCloset" },
+        { text: "Go back to Josh's House entrance", next: "joshsHouse" }
+      ],
+      onEnter: () => { addClue("Searching Josh's room for diary pieces."); }
+    },
+    'underBed': {
+      character: 'Philip',
+      location: "Josh's House",
+      text: `Under the bed, you find several torn pieces of the diary page.`,
+      choices: [
+        { text: "Take the pieces", next: "takePiecesUnderBed" },
+        { text: "Go back to searching room", next: "searchJoshRoom" }
+      ],
+      onEnter: () => { addNote("Found diary pieces under Josh's bed."); }
+    },
+    'takePiecesUnderBed': {
+      character: 'Philip',
+      location: "Josh's House",
+      text: `You take the torn pieces from under the bed and put them in your pocket.`,
+      choices: [
+        { text: "Continue searching the room", next: "searchJoshRoom" },
+        { text: "Go back to Josh's House entrance", next: "joshsHouse" }
+      ],
+      onEnter: () => { addNote("Collected diary pieces from under the bed."); }
+    },
+    'inCloset': {
+      character: 'Philip',
+      location: "Josh's House",
+      text: `In the closet, you find more torn diary pieces, hidden behind some clothes.`,
+      choices: [
+        { text: "Take the pieces", next: "takePiecesInCloset" },
+        { text: "Go back to searching room", next: "searchJoshRoom" }
+      ],
+      onEnter: () => { addNote("Found diary pieces in Josh's closet."); }
+    },
+    'takePiecesInCloset': {
+      character: 'Philip',
+      location: "Josh's House",
+      text: `You take the torn pieces from the closet.`,
+      choices: [
+        { text: "Continue searching the room", next: "searchJoshRoom" },
+        { text: "Go back to Josh's House entrance", next: "joshsHouse" }
+      ],
+      onEnter: () => { addNote("Collected diary pieces from the closet."); }
+    },
+    'talkKaylee': {
+      character: 'Kaylee',
+      location: 'Josh\'s House',
+      text: `Kaylee looks worried but admits she has some of the diary page pieces. She says she took them to protect Josh.`,
+      choices: [
+        { text: "Ask about Nicholas", next: "talkNicholas" },
+        { text: "Ask about Lily and Bri", next: "talkSisters" },
+        { text: "Go back to Josh's House", next: "joshsHouse" }
+      ],
+      onEnter: () => { addSuspect('Kaylee'); addPersonMet('Kaylee'); addNote("Kaylee has some diary page pieces."); }
+    },
+    'talkNicholas': {
+      character: 'Nicholas',
+      location: 'Josh\'s House',
+      text: `Nicholas is evasive but admits to having some diary fragments. He seems nervous.`,
+      choices: [
+        { text: "Ask about Kaylee", next: "talkKaylee" },
+        { text: "Ask about Lily and Bri", next: "talkSisters" },
+        { text: "Go back to Josh's House", next: "joshsHouse" }
+      ],
+      onEnter: () => { addSuspect('Nicholas'); addPersonMet('Nicholas'); addNote("Nicholas is hiding diary fragments."); }
+    },
+    'talkSisters': {
+      character: 'Lily & Bri',
+      location: 'Josh\'s House',
+      text: `Lily and Bri giggle and admit they took some torn diary pages and hid them in Josh's closet.`,
+      choices: [
+        { text: "Ask about Kaylee", next: "talkKaylee" },
+        { text: "Ask about Nicholas", next: "talkNicholas" },
+        { text: "Go back to Josh's House", next: "joshsHouse" }
+      ],
+      onEnter: () => {
+        addSuspect('Lily'); addSuspect('Bri');
+        addPersonMet('Lily'); addPersonMet('Bri');
+        addNote("Lily and Bri have some torn diary pages.");
+      }
+    }
+  };
+
+  // --- Start game ---
   showScene('start');
 })();
