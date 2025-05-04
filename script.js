@@ -547,9 +547,6 @@ function unlockPagePiecesMechanic() {
   addPlace("Josh's House");
   addPlace("Park");
 
-  // Add new scenes or actions related to searching for pieces
-  // This will be handled in scene logic below
-
   // Enable Check Back mechanic (phone calls)
   enableCheckBackMechanic();
 }
@@ -642,9 +639,9 @@ function createBackButton() {
 }
 
 function goBack() {
-  if (historyStack.length === 0) return; // No history
+  if (historyStack.length === 0) return;
   const prevScene = historyStack.pop();
-  currentSceneKey = null; // prevent pushing current scene again
+  currentSceneKey = null;
   showScene(prevScene, false);
 }
 
