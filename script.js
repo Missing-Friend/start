@@ -54,7 +54,7 @@
     if (!placesUnlocked.has(name)) {
       placesUnlocked.add(name);
       showNewPlaceNotification(name);
-      if (name === 'Park') fadeInMapButton();
+      if (name !== 'Your House') fadeInMapButton();
     }
   }
 
@@ -100,10 +100,14 @@
   // === Map Button ===
 
   function fadeInMapButton() {
-    mapButton.style.display = 'block';
-    setTimeout(() => {
-      mapButton.style.opacity = '1';
-    }, 100);
+    if (mapButton.style.display !== 'block') {
+      mapButton.style.display = 'block';
+      mapButton.style.opacity = '0';
+      setTimeout(() => {
+        mapButton.style.transition = 'opacity 1s ease';
+        mapButton.style.opacity = '1';
+      }, 50);
+    }
   }
 
   mapButton.onclick = () => {
