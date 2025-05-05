@@ -312,6 +312,10 @@
 
   // --- Utility functions ---
 
+  function allDiaryPiecesCollected() {
+    return diaryPiecesCollected.underBed && diaryPiecesCollected.inCloset && diaryPiecesCollected.park;
+  }
+
   function addPlace(name) {
     if (!placesUnlocked.has(name)) {
       placesUnlocked.add(name);
@@ -525,7 +529,6 @@
       }
     };
 
-    // Hide nextArrow if diary already turned in or all pieces collected
     if (diaryTurnedIn || allDiaryPiecesCollected()) {
       nextArrow.style.display = 'none';
     }
@@ -706,32 +709,77 @@
     phoneContainer.appendChild(backBtn);
   }
 
-  // --- Helper functions ---
+  // --- Main showScene function ---
 
-  function allDiaryPiecesCollected() {
-    return diaryPiecesCollected.underBed && diaryPiecesCollected.inCloset && diaryPiecesCollected.park;
-  }
-
-  function addPlace(name) {
-    if (!placesUnlocked.has(name)) {
-      placesUnlocked.add(name);
-      showNewPlaceNotification(name);
-      if (name !== 'Your House') fadeInMapButton();
+  function showScene(sceneKey, pushToHistory = true) {
+    if (!sceneKey || !scenes[sceneKey]) {
+      alert(`Scene "${sceneKey}" not found!`);
+      return;
     }
+    if (currentSceneKey && currentSceneKey !== sceneKey && pushToHistory) {
+      historyStack.push(currentSceneKey);
+    }
+    currentSceneKey = sceneKey;
+    currentLocation = Object.keys(placeToSceneKey).find(place => placeToSceneKey[place] === sceneKey) || currentLocation;
+
+    gameScreen.innerHTML = '';
+
+    showLocationSelector();
+
+    const scene = scenes[sceneKey];
+    if (scene.character) showCharacterIntro(scene.character);
+    updateCurrentCharacter(scene.character);
+
+    const p = document.createElement('p');
+
+    if (diaryTurnedIn) {
+      p.textContent = scene.text;
+    } else if (allDiaryPiecesCollected() && scene.diary) {
+      p.textContent = updatedDiaryText;
+    } else {
+      p.textContent = scene.text;
+    }
+    gameScreen.appendChild(p);
+
+    if (!diaryTurnedIn && scene.diary) {
+      const diaryBtn = document.createElement('button');
+      diaryBtn.textContent = "Read Josh's Diary";
+      diaryBtn.onclick = showDiary;
+      gameScreen.appendChild(diaryBtn);
+    }
+
+    if (allDiaryPiecesCollected() && !diaryTurnedIn && (sceneKey === 'start' || sceneKey === 'joshsHouse')) {
+      const callBtn = document.createElement('button');
+      callBtn.textContent = 'Call Somebody';
+      callBtn.style.marginTop = '10px';
+      callBtn.onclick = showPhoneCallModal;
+      gameScreen.appendChild(callBtn);
+    }
+
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.style.marginTop = '1rem';
+
+    createBackButton();
+    if (historyStack.length > 0) {
+      buttonsDiv.appendChild(backButton);
+    }
+
+    scene.choices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.textContent = choice.text;
+      btn.onclick = () => showScene(choice.next);
+      buttonsDiv.appendChild(btn);
+    });
+    gameScreen.appendChild(buttonsDiv);
+
+    gameScreen.scrollTop = 0;
+
+    if (scene.onEnter) scene.onEnter();
   }
 
-  function addPersonMet(name) {
-    peopleMet.add(name);
-  }
+  // --- Location selector ---
 
-  function addClue(clue) {
-    if (!gatheredInfo.clues.includes(clue)) gatheredInfo.clues.push(clue);
-  }
-
-  function addNote(note) {
-    if (!gatheredInfo.notes.includes(note)) gatheredInfo.notes.push(note);
-  }
-
+  let locationSelector = null;
   function showLocationSelector() {
     if (!locationSelector) {
       locationSelector = document.createElement('div');
@@ -754,6 +802,8 @@
       locationSelector.appendChild(btn);
     });
   }
+
+  // --- Character intro popup ---
 
   function showCharacterIntro(name) {
     if (introducedCharacters.has(name)) return;
@@ -786,9 +836,13 @@
     }, 3000);
   }
 
+  // --- Update current character display ---
+
   function updateCurrentCharacter(name) {
     currentCharacterDiv.textContent = name ? `Current: ${name}` : '';
   }
+
+  // --- Back button ---
 
   let backButton = null;
   function createBackButton() {
@@ -805,6 +859,8 @@
     currentSceneKey = null;
     showScene(prevScene, false);
   }
+
+  // --- Info panel handlers ---
 
   function showInfo() {
     let html = '';
@@ -833,6 +889,5 @@
   infoButton.addEventListener('click', showInfo);
 
   // --- Start the game ---
-  let locationSelector = null;
   showScene('start');
 })();
