@@ -313,7 +313,6 @@
     p.textContent = scene.text;
     gameScreen.appendChild(p);
 
-    // Show diary button only if scene.diary === true
     if (scene.diary) {
       const diaryBtn = document.createElement('button');
       diaryBtn.textContent = "Read Josh's Diary";
@@ -453,40 +452,11 @@
   });
   infoButton.addEventListener('click', showInfo);
 
-  // === Scenes object ===
-  // (Add your full scenes here, example with diary: true on Josh's House)
-  const scenes = {
-    start: {
-      character: 'Philip',
-      location: 'Your House',
-      text: `It’s a foggy, rainy evening in Arlington. You and your friend Josh just left the park. You ask him to text you when he gets home, but hours pass with no message.`,
-      choices: [
-        { text: "Check your phone for messages", next: "checkPhone" },
-        { text: "Go to Josh's House", next: "joshsHouse" },
-        { text: "Go to the Park", next: "park" }
-      ],
-      onEnter: () => {
-        addPlace('Your House');
-        addPersonMet('Philip');
-      }
-    },
-    joshsHouse: {
-      character: "Josh's Brother",
-      location: "Josh's House",
-      diary: true, // <-- Diary button will appear here
-      text: `You arrive at Josh's house. His brother answers the door and says Josh never came home.`,
-      choices: [
-        { text: "Ask about Josh's friends", next: "askFriends" },
-        { text: "Check Josh's social media", next: "checkSocial" },
-        { text: "Search Josh's room", next: "searchJoshRoom" }
-      ],
-      onEnter: () => {
-        addPlace("Josh's House");
-        addPersonMet("Josh's Brother");
-      }
-    },
-    // ... add other scenes similarly
-  };
+  // === Scenes ===
+
+  // Add all your scenes here; for brevity, here are key scenes with diary:true on Josh's House:
+
+  scenes.joshsHouse.diary = true;
 
   // === Start the game ===
   showScene('start');
