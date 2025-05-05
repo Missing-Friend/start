@@ -22,7 +22,6 @@
   // --- Diary pages ---
   const diaryPages = [
     `"Diary Entry 1/10/25"\n\nI have seen some things.. Pretty bad things before. But this thing.. It SCARES me!\nMost people would just keep walking, but I got too curious..\nI haven't really been as traumatized as I've ever been, Aliya even thinks I'm "off"!\n\nThere was this man in the park.. and it wasn't some ordinary man.. It wasn't the nice homeless man I've talked to before. No, this man is a monster!\nI'm running out of time, so when I run around town, they're gonna feel this one!\nLike a magic GONE! Its like he was a magician with a New Magic Wand!\n\nI don't have enough page space for this.. I have to write a new page.."`,
-    // Second page ripped out
   ];
 
   // --- Utility functions ---
@@ -34,12 +33,9 @@
     if (!placesUnlocked.has(name)) {
       placesUnlocked.add(name);
       showNewPlaceNotification(name);
-      if (name === 'Park') {
-        fadeInMapButton();
-      }
+      if (name === 'Park') fadeInMapButton();
     }
   }
-
   function showNewPlaceNotification(placeName) {
     const notif = document.createElement('div');
     notif.textContent = `${placeName} has been added to your logbook...`;
@@ -521,8 +517,19 @@
 
   // --- Scenes object ---
   const scenes = {
-    // Your existing scenes here (start, checkPhone, joshsHouse, park, etc.)
-    // Add new scenes for Local Police Station and Cafe He Visits:
+    // Your scenes here, including new locations like 'localpolicestation' and 'cafehevisits'
+    start: {
+      character: 'Philip',
+      location: 'Your House',
+      text: `It’s a foggy, rainy evening in Arlington. You and your friend Josh just left the park. You ask him to text you when he gets home, but hours pass with no message.`,
+      choices: [
+        { text: "Check your phone for messages", next: "checkPhone" },
+        { text: "Go to Josh's House", next: "joshsHouse" },
+        { text: "Go to the Park", next: "park" }
+      ],
+      onEnter: () => { addPlace('Your House'); addPersonMet('Philip'); }
+    },
+    // Add other scenes here...
     localpolicestation: {
       character: 'Sergeant Miller',
       location: 'Local Police Station',
@@ -531,10 +538,7 @@
         { text: "Report Josh missing", next: "fileReport" },
         { text: "Go back", next: "start" }
       ],
-      onEnter: () => {
-        addPlace("Local Police Station");
-        addPersonMet('Sergeant Miller');
-      }
+      onEnter: () => { addPlace("Local Police Station"); addPersonMet('Sergeant Miller'); }
     },
     cafehevisits: {
       character: 'Barista',
@@ -544,12 +548,8 @@
         { text: "Ask about regular customers", next: "askRegulars" },
         { text: "Go back", next: "start" }
       ],
-      onEnter: () => {
-        addPlace("Cafe He Visits");
-        addPersonMet('Barista');
-      }
+      onEnter: () => { addPlace("Cafe He Visits"); addPersonMet('Barista'); }
     },
-    // Add placeholder scenes for fileReport, askRegulars, etc.
     fileReport: {
       character: 'Sergeant Miller',
       location: 'Local Police Station',
@@ -566,10 +566,163 @@
         { text: "Go back", next: "cafehevisits" }
       ]
     },
-    // Add all other scenes you had previously, making sure all .next keys exist
+    // Add all other scenes as needed...
   };
 
-  // --- Show Scene function and all other functions remain as previously defined ---
+  // --- Show Scene function ---
+  function showScene(sceneKey, pushToHistory = true) {
+    if (!sceneKey) {
+      console.error("Invalid scene key:", sceneKey);
+      gameScreen.innerHTML = `<p>Invalid scene key.</p>`;
+      currentCharacterDiv.textContent = '';
+      return;
+    }
+    const scene = scenes[sceneKey];
+    if (!scene) {
+      console.error(`Scene "${sceneKey}" Not Found`);
+      gameScreen.innerHTML = `<p>Scene "${sceneKey}" Not Found</p>`;
+      currentCharacterDiv.textContent = '';
+      return;
+    }
+    if (currentSceneKey && currentSceneKey !== sceneKey && pushToHistory) {
+      historyStack.push(currentSceneKey);
+    }
+    currentSceneKey = sceneKey;
+    if (scene.onEnter) scene.onEnter();
+    if (scene.character) showCharacterIntro(scene.character);
+    updateCurrentCharacter(scene.character);
+    gameScreen.innerHTML = '';
+    showLocationSelector();
+    const sceneText = document.createElement('p');
+    sceneText.textContent = scene.text;
+    gameScreen.appendChild(sceneText);
+    if (scene.diary) {
+      const diaryBtn = document.createElement('button');
+      diaryBtn.textContent = 'Read Josh\'s Diary';
+      diaryBtn.onclick = showDiary;
+      gameScreen.appendChild(diaryBtn);
+    }
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.marginTop = '1rem';
+    createBackButton();
+    if (historyStack.length > 0) {
+      buttonContainer.appendChild(backButton);
+    }
+    scene.choices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.textContent = choice.text;
+      btn.onclick = () => showScene(choice.next);
+      buttonContainer.appendChild(btn);
+    });
+    gameScreen.appendChild(buttonContainer);
+    gameScreen.scrollTop = 0;
+  }
+
+  // --- Location selector ---
+  let locationSelector = null;
+  function showLocationSelector() {
+    if (!locationSelector) {
+      locationSelector = document.createElement('div');
+      locationSelector.id = 'location-selector';
+      locationSelector.style = `
+        margin-bottom: 1rem;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+      `;
+      gameScreen.prepend(locationSelector);
+    }
+    locationSelector.innerHTML = '';
+    placesUnlocked.forEach(place => {
+      const btn = document.createElement('button');
+      btn.textContent = place;
+      btn.style = `
+        background-color: ${place === currentLocation ? '#4a4' : '#222'};
+        color: #afa;
+        border: none;
+        border-radius: 8px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease;
+      `;
+      btn.onmouseenter = () => {
+        if (place !== currentLocation) btn.style.backgroundColor = '#6a6';
+      };
+      btn.onmouseleave = () => {
+        if (place !== currentLocation) btn.style.backgroundColor = '#222';
+      };
+      btn.onclick = () => {
+        if (place === currentLocation) return;
+        currentLocation = place;
+        showScene(place.toLowerCase().replace(/ /g, ''));
+      };
+      locationSelector.appendChild(btn);
+    });
+  }
+
+  // --- Character intro ---
+  function showCharacterIntro(name) {
+    if (introducedCharacters.has(name)) return;
+    introducedCharacters.add(name);
+    const introBox = document.createElement('div');
+    introBox.textContent = characterInfoMap[name] || name;
+    introBox.style = `
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      color: #afa;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      z-index: 4000;
+      user-select: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    `;
+    document.body.appendChild(introBox);
+    setTimeout(() => introBox.style.opacity = '1', 50);
+    setTimeout(() => {
+      introBox.style.opacity = '0';
+      setTimeout(() => {
+        document.body.removeChild(introBox);
+      }, 500);
+    }, 3000);
+  }
+
+  // --- Update current character display ---
+  function updateCurrentCharacter(name) {
+    currentCharacterDiv.textContent = name ? `Current: ${name}` : '';
+  }
+
+  // --- Info panel ---
+  function showInfo() {
+    let html = '';
+    if (gatheredInfo.clues.length) {
+      html += '<h3>Clues:</h3><ul>';
+      gatheredInfo.clues.forEach(clue => { html += `<li>${clue}</li>`; });
+      html += '</ul>';
+    }
+    if (gatheredInfo.suspects.length) {
+      html += '<h3>Suspects:</h3><ul>';
+      gatheredInfo.suspects.forEach(suspect => { html += `<li>${suspect}</li>`; });
+      html += '</ul>';
+    }
+    if (gatheredInfo.notes.length) {
+      html += '<h3>Notes:</h3><ul>';
+      gatheredInfo.notes.forEach(note => { html += `<li>${note}</li>`; });
+      html += '</ul>';
+    }
+    infoContent.innerHTML = html || '<p>No information gathered yet.</p>';
+    infoPanel.style.display = 'block';
+  }
+  closeInfo.addEventListener('click', () => { infoPanel.style.display = 'none'; });
+  infoButton.addEventListener('click', showInfo);
 
   // --- Start game ---
   showScene('start');
