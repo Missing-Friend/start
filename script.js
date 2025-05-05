@@ -18,7 +18,17 @@
   let peopleMet = new Set(['Philip']);
   let diaryPageRipped = false;
 
-  // === Place to scene mapping ===
+  // Track collected diary pieces
+  const diaryPiecesCollected = {
+    underBed: false,
+    inCloset: false,
+    park: false
+  };
+
+  // Flag to disable diary after turning in
+  let diaryTurnedIn = false;
+
+  // === Place to scene key mapping ===
   const placeToSceneKey = {
     "Your House": "start",
     "Josh's House": "joshsHouse",
@@ -37,16 +47,19 @@
     'Homeless Man': 'Homeless Man - Seen near the park, mysterious figure.',
     'David': 'David - Josh\'s online best friend.',
     'Amber': 'Amber - Another online friend of Josh.',
-    'Kaylee': 'Kaylee - Josh\'s mother.',
-    'Nicholas': 'Nicholas - Josh\'s father.',
-    'Lily': 'Lily - Josh\'s sister.',
-    'Bri': 'Bri - Josh\'s other sister.'
+    'Kaylee': 'Josh\'s mother.',
+    'Nicholas': 'Josh\'s father.',
+    'Lily': 'Josh\'s sister.',
+    'Bri': 'Josh\'s other sister.'
   };
 
   // === Diary pages ===
   const diaryPages = [
     `"Diary Entry 1/10/25"\n\nI have seen some things.. Pretty bad things before. But this thing.. It SCARES me!\nMost people would just keep walking, but I got too curious..\nI haven't really been as traumatized as I've ever been, Aliya even thinks I'm "off"!\n\nThere was this man in the park.. and it wasn't some ordinary man.. It wasn't the nice homeless man I've talked to before. No, this man is a monster!\nI'm running out of time, so when I run around town, they're gonna feel this one!\nLike a magic GONE! Its like he was a magician with a New Magic Wand!\n\nI don't have enough page space for this.. I have to write a new page.."`,
   ];
+
+  // Updated diary text after collecting all pieces
+  const updatedDiaryText = `"Diary Entry Update"\n\nI found him at the park, he had black hair and sunglasses. He was a very odd person...\nHe was carrying a trash bag with a body in it.. and I went to go see what he was doing!\nBut he saw me, and I ran home, he knows where I live now... And he's standing outside!\n\nIf anyone is reading this; Why are you reading my diary, but also.. Go online and search up GoTube.com and click on my channel and click on the most recent video.. it explains everything...!"`;
 
   // === Scenes object ===
   const scenes = {
@@ -161,7 +174,8 @@
         { text: "Go back", next: "searchJoshRoom" }
       ],
       onEnter: () => {
-        addNote("Found diary pieces under Josh's bed.");
+        diaryPiecesCollected.underBed = true;
+        addNote("Collected diary pieces from under the bed.");
       }
     },
     takePiecesUnderBed: {
@@ -185,7 +199,8 @@
         { text: "Go back", next: "searchJoshRoom" }
       ],
       onEnter: () => {
-        addNote("Found diary pieces in Josh's closet.");
+        diaryPiecesCollected.inCloset = true;
+        addNote("Collected diary pieces from the closet.");
       }
     },
     takePiecesInCloset: {
@@ -233,6 +248,7 @@
         { text: "Go back to Your House", next: "start" }
       ],
       onEnter: () => {
+        diaryPiecesCollected.park = true;
         addNote("Collected diary pieces from the park.");
         addPlace("Josh's House");
       }
@@ -242,6 +258,7 @@
       location: 'Local Police Station',
       text: `The police station is quiet. Sergeant Miller looks up from his desk. "Can I help you with something?"`,
       choices: [
+        { text: "Turn in the diary", next: "turnInDiary" },
         { text: "Report Josh missing", next: "fileReport" },
         { text: "Go back", next: "start" }
       ],
@@ -257,6 +274,18 @@
       choices: [
         { text: "Go back", next: "localpolicestation" }
       ]
+    },
+    turnInDiary: {
+      character: 'Sergeant Miller',
+      location: 'Local Police Station',
+      text: `You hand over the diary to Sergeant Miller. He looks at it carefully and nods.\n\n"Thank you for bringing this in. This will help us a lot."\n\nYou can no longer read the diary now.`,
+      choices: [
+        { text: "Go back", next: "localpolicestation" }
+      ],
+      onEnter: () => {
+        diaryTurnedIn = true;
+        gatheredInfo.notes.push("Diary turned in to Sergeant Miller.");
+      }
     },
     cafehevisits: {
       character: 'Barista',
@@ -281,7 +310,7 @@
     }
   };
 
-  // === Utility functions ===
+  // --- Utility functions ---
 
   function addPlace(name) {
     if (!placesUnlocked.has(name)) {
@@ -330,7 +359,7 @@
     }, 3500);
   }
 
-  // === Map button and overlay ===
+  // --- Map button and overlay ---
 
   function fadeInMapButton() {
     if (mapButton.style.display !== 'block') {
@@ -424,7 +453,7 @@
     document.body.appendChild(overlay);
   }
 
-  // === Diary popup ===
+  // --- Diary popup ---
 
   function showDiary() {
     const overlay = document.createElement('div');
@@ -460,7 +489,7 @@
 
     const pageText = document.createElement('div');
     pageText.id = 'page-text';
-    pageText.textContent = diaryPages[0];
+    pageText.textContent = allDiaryPiecesCollected() && !diaryTurnedIn ? updatedDiaryText : diaryPages[0];
 
     const nextArrow = document.createElement('button');
     nextArrow.textContent = '→';
@@ -496,6 +525,11 @@
       }
     };
 
+    // Hide nextArrow if diary already turned in or all pieces collected
+    if (diaryTurnedIn || allDiaryPiecesCollected()) {
+      nextArrow.style.display = 'none';
+    }
+
     const closeBtn = document.createElement('button');
     closeBtn.textContent = 'Close Diary';
     closeBtn.style = `
@@ -521,62 +555,183 @@
     document.body.appendChild(overlay);
   }
 
-  // === Show scene function ===
+  // --- Phone call mechanic ---
 
-  function showScene(sceneKey, pushToHistory = true) {
-    if (!sceneKey || !scenes[sceneKey]) {
-      alert(`Scene "${sceneKey}" not found!`);
-      return;
-    }
-    if (currentSceneKey && currentSceneKey !== sceneKey && pushToHistory) {
-      historyStack.push(currentSceneKey);
-    }
-    currentSceneKey = sceneKey;
-    currentLocation = Object.keys(placeToSceneKey).find(place => placeToSceneKey[place] === sceneKey) || currentLocation;
+  const phoneContacts = {
+    'Nate': 'Hey, haven\'t heard from Josh lately. He seemed stressed about something.',
+    'Aliya': 'Josh has been acting strange. I hope he\'s okay.',
+    "Josh's Brother": 'I wish I could help more. Let me know if you find anything.',
+    'Homeless Man': 'I saw something weird near the park last night.',
+    'David': 'Josh was talking about meeting someone but didn\'t say who.',
+    'Amber': 'I think Josh was scared of someone online.',
+    'Kaylee': 'I\'m worried about Josh. Please find him.',
+    'Nicholas': 'Josh is my son. I hope he\'s safe.',
+    'Lily': 'I miss Josh. Please find him.',
+    'Bri': 'We need to find Josh soon!'
+  };
 
-    gameScreen.innerHTML = '';
+  function showPhoneCallModal() {
+    const overlay = document.createElement('div');
+    overlay.style = `
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.9);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 8000;
+      color: #afa;
+      font-family: monospace, monospace;
+    `;
 
-    showLocationSelector();
+    const phoneContainer = document.createElement('div');
+    phoneContainer.style = `
+      background: #222;
+      padding: 20px;
+      border-radius: 15px;
+      width: 320px;
+      max-height: 70vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    `;
 
-    const scene = scenes[sceneKey];
-    if (scene.character) showCharacterIntro(scene.character);
-    updateCurrentCharacter(scene.character);
+    const title = document.createElement('h2');
+    title.textContent = 'Call Somebody';
+    title.style.marginBottom = '10px';
+    phoneContainer.appendChild(title);
 
-    const p = document.createElement('p');
-    p.textContent = scene.text;
-    gameScreen.appendChild(p);
-
-    if (scene.diary) {
-      const diaryBtn = document.createElement('button');
-      diaryBtn.textContent = "Read Josh's Diary";
-      diaryBtn.onclick = showDiary;
-      gameScreen.appendChild(diaryBtn);
-    }
-
-    const buttonsDiv = document.createElement('div');
-    buttonsDiv.style.marginTop = '1rem';
-
-    createBackButton();
-    if (historyStack.length > 0) {
-      buttonsDiv.appendChild(backButton);
-    }
-
-    scene.choices.forEach(choice => {
+    Object.keys(phoneContacts).forEach(name => {
       const btn = document.createElement('button');
-      btn.textContent = choice.text;
-      btn.onclick = () => showScene(choice.next);
-      buttonsDiv.appendChild(btn);
+      btn.textContent = name;
+      btn.style = `
+        margin: 5px 0;
+        padding: 10px;
+        background: #333;
+        color: #afa;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        text-align: left;
+      `;
+      btn.onclick = () => showCallDialogue(name, phoneContacts[name], overlay);
+      phoneContainer.appendChild(btn);
     });
-    gameScreen.appendChild(buttonsDiv);
 
-    gameScreen.scrollTop = 0;
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close Phone';
+    closeBtn.style = `
+      margin-top: 15px;
+      padding: 10px;
+      background: #4a4;
+      color: #afa;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    `;
+    closeBtn.onclick = () => document.body.removeChild(overlay);
+    phoneContainer.appendChild(closeBtn);
 
-    if (scene.onEnter) scene.onEnter();
+    overlay.appendChild(phoneContainer);
+    document.body.appendChild(overlay);
   }
 
-  // === Location selector ===
+  function showCallDialogue(name, message, overlay) {
+    const phoneContainer = overlay.firstChild;
+    phoneContainer.innerHTML = '';
 
-  let locationSelector = null;
+    const title = document.createElement('h2');
+    title.textContent = `Calling ${name}...`;
+    title.style.marginBottom = '10px';
+    phoneContainer.appendChild(title);
+
+    const msg = document.createElement('p');
+    msg.textContent = message;
+    msg.style.whiteSpace = 'pre-wrap';
+    phoneContainer.appendChild(msg);
+
+    const backBtn = document.createElement('button');
+    backBtn.textContent = 'Back to Contacts';
+    backBtn.style = `
+      margin-top: 15px;
+      padding: 10px;
+      background: #444;
+      color: #afa;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    `;
+    backBtn.onclick = () => {
+      phoneContainer.innerHTML = '';
+      const title = document.createElement('h2');
+      title.textContent = 'Call Somebody';
+      title.style.marginBottom = '10px';
+      phoneContainer.appendChild(title);
+
+      Object.keys(phoneContacts).forEach(contactName => {
+        const btn = document.createElement('button');
+        btn.textContent = contactName;
+        btn.style = `
+          margin: 5px 0;
+          padding: 10px;
+          background: #333;
+          color: #afa;
+          border: none;
+          border-radius: 8px;
+          font-weight: 700;
+          cursor: pointer;
+          text-align: left;
+        `;
+        btn.onclick = () => showCallDialogue(contactName, phoneContacts[contactName], overlay);
+        phoneContainer.appendChild(btn);
+      });
+
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = 'Close Phone';
+      closeBtn.style = `
+        margin-top: 15px;
+        padding: 10px;
+        background: #4a4;
+        color: #afa;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+      `;
+      closeBtn.onclick = () => document.body.removeChild(overlay);
+      phoneContainer.appendChild(closeBtn);
+    };
+    phoneContainer.appendChild(backBtn);
+  }
+
+  // --- Helper functions ---
+
+  function allDiaryPiecesCollected() {
+    return diaryPiecesCollected.underBed && diaryPiecesCollected.inCloset && diaryPiecesCollected.park;
+  }
+
+  function addPlace(name) {
+    if (!placesUnlocked.has(name)) {
+      placesUnlocked.add(name);
+      showNewPlaceNotification(name);
+      if (name !== 'Your House') fadeInMapButton();
+    }
+  }
+
+  function addPersonMet(name) {
+    peopleMet.add(name);
+  }
+
+  function addClue(clue) {
+    if (!gatheredInfo.clues.includes(clue)) gatheredInfo.clues.push(clue);
+  }
+
+  function addNote(note) {
+    if (!gatheredInfo.notes.includes(note)) gatheredInfo.notes.push(note);
+  }
+
   function showLocationSelector() {
     if (!locationSelector) {
       locationSelector = document.createElement('div');
@@ -599,8 +754,6 @@
       locationSelector.appendChild(btn);
     });
   }
-
-  // === Character intro popup ===
 
   function showCharacterIntro(name) {
     if (introducedCharacters.has(name)) return;
@@ -633,13 +786,9 @@
     }, 3000);
   }
 
-  // === Update current character display ===
-
   function updateCurrentCharacter(name) {
     currentCharacterDiv.textContent = name ? `Current: ${name}` : '';
   }
-
-  // === Back button ===
 
   let backButton = null;
   function createBackButton() {
@@ -656,8 +805,6 @@
     currentSceneKey = null;
     showScene(prevScene, false);
   }
-
-  // === Info panel handlers ===
 
   function showInfo() {
     let html = '';
@@ -685,6 +832,7 @@
   });
   infoButton.addEventListener('click', showInfo);
 
-  // === Start the game ===
+  // --- Start the game ---
+  let locationSelector = null;
   showScene('start');
 })();
