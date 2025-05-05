@@ -1,4 +1,13 @@
 (() => {
+  // Mapping from place names to scene keys - declared ONCE here
+  const placeToSceneKey = {
+    "Your House": "start",
+    "Josh's House": "joshsHouse",
+    "Park": "park",
+    "Local Police Station": "localpolicestation",
+    "Cafe He Visits": "cafehevisits"
+  };
+
   // DOM references
   const gameScreen = document.getElementById('game-screen');
   const infoButton = document.getElementById('info-button');
@@ -103,15 +112,6 @@
     }, 100);
   }
 
-  // Map place-to-scene mapping (correct mapping)
-  const placeToSceneKey = {
-    "Your House": "start",
-    "Josh's House": "joshsHouse",
-    "Park": "park",
-    "Local Police Station": "localpolicestation",
-    "Cafe He Visits": "cafehevisits"
-  };
-
   mapButton.onclick = () => {
     showMap();
   };
@@ -162,14 +162,14 @@
         font-weight: 700;
       `;
       btn.onclick = () => {
-        currentLocation = place;
         const sceneKey = placeToSceneKey[place];
         if (sceneKey) {
+          currentLocation = place;
           showScene(sceneKey);
+          document.body.removeChild(overlay);
         } else {
           alert(`No scene defined for location: ${place}`);
         }
-        document.body.removeChild(overlay);
       };
       mapContent.appendChild(btn);
     });
@@ -194,7 +194,7 @@
     document.body.appendChild(overlay);
   }
 
-  // Diary popup (same as before)
+  // Diary popup
   function showDiary() {
     const overlay = document.createElement('div');
     overlay.id = 'diary-overlay';
@@ -299,9 +299,9 @@
     enableCheckBackMechanic();
   }
 
-  // Phone call mechanic omitted for brevity (add as needed)
+  // Phone call mechanic omitted for brevity - implement as needed
 
-  // Scenes object with all scenes and valid keys
+  // Scenes object (all scenes with valid keys)
   const scenes = {
     start: {
       character: 'Philip',
@@ -361,7 +361,6 @@
         { text: "Go back", next: "joshsHouse" }
       ]
     },
-    // Add all other scenes here with valid keys...
     park: {
       character: 'Philip',
       location: 'Park',
@@ -587,13 +586,4 @@
 
   // Start the game
   showScene('start');
-
-  // Map place to scene key mapping (used in location selector and map)
-  const placeToSceneKey = {
-    "Your House": "start",
-    "Josh's House": "joshsHouse",
-    "Park": "park",
-    "Local Police Station": "localpolicestation",
-    "Cafe He Visits": "cafehevisits"
-  };
 })();
