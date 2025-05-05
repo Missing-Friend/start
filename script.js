@@ -1,5 +1,5 @@
 (() => {
-  // Mapping from place names to scene keys - declared ONCE here
+  // Mapping from place names to scene keys
   const placeToSceneKey = {
     "Your House": "start",
     "Josh's House": "joshsHouse",
@@ -32,7 +32,7 @@
     `"Diary Entry 1/10/25"\n\nI have seen some things.. Pretty bad things before. But this thing.. It SCARES me!\nMost people would just keep walking, but I got too curious..\nI haven't really been as traumatized as I've ever been, Aliya even thinks I'm "off"!\n\nThere was this man in the park.. and it wasn't some ordinary man.. It wasn't the nice homeless man I've talked to before. No, this man is a monster!\nI'm running out of time, so when I run around town, they're gonna feel this one!\nLike a magic GONE! Its like he was a magician with a New Magic Wand!\n\nI don't have enough page space for this.. I have to write a new page.."`,
   ];
 
-  // Utility functions
+  // Utility functions to add info
   function addClue(clue) { if (!gatheredInfo.clues.includes(clue)) gatheredInfo.clues.push(clue); }
   function addSuspect(suspect) { if (!gatheredInfo.suspects.includes(suspect)) gatheredInfo.suspects.push(suspect); }
   function addNote(note) { if (!gatheredInfo.notes.includes(note)) gatheredInfo.notes.push(note); }
@@ -44,6 +44,8 @@
       if (name === 'Park') fadeInMapButton();
     }
   }
+
+  // Notification for new places
   function showNewPlaceNotification(placeName) {
     const notif = document.createElement('div');
     notif.textContent = `${placeName} has been added to your logbook...`;
@@ -116,7 +118,7 @@
     showMap();
   };
 
-  // Show map overlay with correct scene navigation
+  // Show map overlay with correct navigation
   function showMap() {
     const overlay = document.createElement('div');
     overlay.style = `
@@ -299,9 +301,9 @@
     enableCheckBackMechanic();
   }
 
-  // Phone call mechanic omitted for brevity - implement as needed
+  // Phone call mechanic omitted here for brevity (add as needed)
 
-  // Scenes object (all scenes with valid keys)
+  // Scenes object with all scenes and valid keys
   const scenes = {
     start: {
       character: 'Philip',
@@ -361,35 +363,56 @@
         { text: "Go back", next: "joshsHouse" }
       ]
     },
-    park: {
+    searchJoshRoom: {
       character: 'Philip',
-      location: 'Park',
-      text: `You arrive at the park where you last saw Josh. The fog and rain make everything look eerie.`,
+      location: "Josh's House",
+      text: `You search Josh's room carefully. You find torn diary pieces under his bed and in his closet.`,
       choices: [
-        { text: "Look around the park", next: "lookAroundPark" },
-        { text: "Go back to Your House", next: "start" }
+        { text: "Look under the bed", next: "underBed" },
+        { text: "Look in the closet", next: "inCloset" },
+        { text: "Go back", next: "joshsHouse" }
       ],
-      onEnter: () => { addPlace('Park'); }
+      onEnter: () => { addClue("Searching Josh's room for diary pieces."); }
     },
-    lookAroundPark: {
+    underBed: {
       character: 'Philip',
-      location: 'Park',
-      text: `You find some torn pieces of paper near a bench. Could these be from Josh's diary?`,
+      location: "Josh's House",
+      text: `Under the bed, you find several torn pieces of the diary page.`,
       choices: [
-        { text: "Collect torn pieces", next: "collectPiecesPark" },
-        { text: "Go back", next: "park" }
+        { text: "Take the pieces", next: "takePiecesUnderBed" },
+        { text: "Go back", next: "searchJoshRoom" }
       ],
-      onEnter: () => { addClue("Found torn diary pieces at the park."); }
+      onEnter: () => { addNote("Found diary pieces under Josh's bed."); }
     },
-    collectPiecesPark: {
+    takePiecesUnderBed: {
       character: 'Philip',
-      location: 'Park',
-      text: `You collect the torn pieces. They might help you understand what Josh was scared of.`,
+      location: "Josh's House",
+      text: `You take the torn pieces from under the bed and put them in your pocket.`,
       choices: [
-        { text: "Go back to Josh's House", next: "joshsHouse" },
-        { text: "Go back to Your House", next: "start" }
+        { text: "Continue searching the room", next: "searchJoshRoom" },
+        { text: "Go back", next: "joshsHouse" }
       ],
-      onEnter: () => { addNote("Collected diary pieces from the park."); addPlace("Josh's House"); }
+      onEnter: () => { addNote("Collected diary pieces from under the bed."); }
+    },
+    inCloset: {
+      character: 'Philip',
+      location: "Josh's House",
+      text: `In the closet, you find more torn diary pieces, hidden behind some clothes.`,
+      choices: [
+        { text: "Take the pieces", next: "takePiecesInCloset" },
+        { text: "Go back", next: "searchJoshRoom" }
+      ],
+      onEnter: () => { addNote("Found diary pieces in Josh's closet."); }
+    },
+    takePiecesInCloset: {
+      character: 'Philip',
+      location: "Josh's House",
+      text: `You take the torn pieces from the closet.`,
+      choices: [
+        { text: "Continue searching the room", next: "searchJoshRoom" },
+        { text: "Go back", next: "joshsHouse" }
+      ],
+      onEnter: () => { addNote("Collected diary pieces from the closet."); }
     },
     localpolicestation: {
       character: 'Sergeant Miller',
@@ -426,6 +449,36 @@
       choices: [
         { text: "Go back", next: "cafehevisits" }
       ]
+    },
+    park: {
+      character: 'Philip',
+      location: 'Park',
+      text: `You arrive at the park where you last saw Josh. The fog and rain make everything look eerie.`,
+      choices: [
+        { text: "Look around the park", next: "lookAroundPark" },
+        { text: "Go back to Your House", next: "start" }
+      ],
+      onEnter: () => { addPlace('Park'); }
+    },
+    lookAroundPark: {
+      character: 'Philip',
+      location: 'Park',
+      text: `You find some torn pieces of paper near a bench. Could these be from Josh's diary?`,
+      choices: [
+        { text: "Collect torn pieces", next: "collectPiecesPark" },
+        { text: "Go back", next: "park" }
+      ],
+      onEnter: () => { addClue("Found torn diary pieces at the park."); }
+    },
+    collectPiecesPark: {
+      character: 'Philip',
+      location: 'Park',
+      text: `You collect the torn pieces. They might help you understand what Josh was scared of.`,
+      choices: [
+        { text: "Go back to Josh's House", next: "joshsHouse" },
+        { text: "Go back to Your House", next: "start" }
+      ],
+      onEnter: () => { addNote("Collected diary pieces from the park."); addPlace("Josh's House"); }
     }
   };
 
