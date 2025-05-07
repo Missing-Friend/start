@@ -55,7 +55,7 @@ AUTHORITY CLEARANCE REQUIRED: LEVEL 5\n
 
   function flashImage() {
     const img = new Image();
-    img.src = 'https://i.pinimg.com/236x/9f/24/21/9f2421cc846c3b372c075a0f5a668b8e.jpg';
+    img.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRR8SvTTkT_cT5TM-3qcVW_54j1Q_LyqyNeTevVMdwxbVydk6Cty3jSy3q91DPoXrcC51o&usqp=CAU';
 
     img.onload = () => {
       img.style.position = 'fixed';
