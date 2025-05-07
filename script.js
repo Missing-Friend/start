@@ -17,6 +17,7 @@
   let gatheredInfo = { clues: [], suspects: [], notes: [] };
   let peopleMet = new Set(['Philip']);
   let diaryPageRipped = false;
+  let diaryTurnedIn = false;
 
   // Track collected diary pieces
   const diaryPiecesCollected = {
@@ -24,9 +25,6 @@
     inCloset: false,
     park: false
   };
-
-  // Flag to disable diary after turning in
-  let diaryTurnedIn = false;
 
   // === Place to scene key mapping ===
   const placeToSceneKey = {
@@ -55,10 +53,9 @@
 
   // === Diary pages ===
   const diaryPages = [
-    `"Diary Entry 1/10/25"\n\nI have seen some things.. Pretty bad things before. But this thing.. It SCARES me!\nMost people would just keep walking, but I got too curious..\nI haven't really been as traumatized as I've ever been, Aliya even thinks I'm "off"!\n\nThere was this man in the park.. and it wasn't some ordinary man.. It wasn't the nice homeless man I've talked to before. No, this man is a monster!\nI'm running out of time, so when I ride around town, he'll feel this one! But yet...\nLike magic, GONE! Its like he was a magician with a New Magic Wand!\n\nI don't have enough page space for this.. I have to write a new page.."`,
+    `"Diary Entry 1/10/25"\n\nI have seen some things.. Pretty bad things before. But this thing.. It SCARES me!\nMost people would just keep walking, but I got too curious..\nI haven't really been as traumatized as I've ever been, Aliya even thinks I'm "off"!\n\nThere was this man in the park.. and it wasn't some ordinary man.. It wasn't the nice homeless man I've talked to before. No, this man is a monster!\nI'm running out of time, so when I run around town, they're gonna feel this one!\nLike a magic GONE! Its like he was a magician with a New Magic Wand!\n\nI don't have enough page space for this.. I have to write a new page.."`,
   ];
 
-  // Updated diary text after collecting all pieces
   const updatedDiaryText = `"Diary Entry Update"\n\nI found him at the park, he had black hair and sunglasses. He was a very odd person...\nHe was carrying a trash bag with a body in it.. and I went to go see what he was doing!\nBut he saw me, and I ran home, he knows where I live now... And he's standing outside!\n\nIf anyone is reading this; Why are you reading my diary, but also.. Go online and search up GoTube.com and click on my channel and click on the most recent video.. it explains everything...!"`;
 
   // === Scenes object ===
@@ -276,22 +273,20 @@
       ]
     },
     turnInDiary: {
-  character: 'Sergeant Miller',
-  location: 'Local Police Station',
-  text: `You hand over the diary to Sergeant Miller. He looks at it carefully and nods.\n\n"Thank you for bringing this in. This will help us a lot."\n\nYou can no longer read the diary now.`,
-  choices: [
-    { text: "Go back", next: "localpolicestation" }
-  ],
-  onEnter: () => {
-    diaryTurnedIn = true;
-    gatheredInfo.notes.push("Diary turned in to Sergeant Miller.");
-    // Redirect to cinematic page after a short delay for dramatic effect
-    setTimeout(() => {
-      window.location.href = 'ubegubewubgewbg.html';
-    }, 1500); // 1.5 seconds delay
-  }
-}
-
+      character: 'Sergeant Miller',
+      location: 'Local Police Station',
+      text: `You hand over the diary to Sergeant Miller. He looks at it carefully and nods.\n\n"Thank you for bringing this in. This will help us a lot."\n\nYou can no longer read the diary now.`,
+      choices: [
+        { text: "Go back", next: "localpolicestation" }
+      ],
+      onEnter: () => {
+        diaryTurnedIn = true;
+        gatheredInfo.notes.push("Diary turned in to Sergeant Miller.");
+        // Redirect to cinematic page after short delay
+        setTimeout(() => {
+          window.location.href = 'ubegubewubgewbg.html';
+        }, 1500);
+      }
     },
     cafehevisits: {
       character: 'Barista',
@@ -317,10 +312,6 @@
   };
 
   // --- Utility functions ---
-
-  function allDiaryPiecesCollected() {
-    return diaryPiecesCollected.underBed && diaryPiecesCollected.inCloset && diaryPiecesCollected.park;
-  }
 
   function addPlace(name) {
     if (!placesUnlocked.has(name)) {
@@ -368,8 +359,6 @@
       setTimeout(() => document.body.removeChild(notif), 1000);
     }, 3500);
   }
-
-  // --- Map button and overlay ---
 
   function fadeInMapButton() {
     if (mapButton.style.display !== 'block') {
@@ -463,8 +452,7 @@
     document.body.appendChild(overlay);
   }
 
-  // --- Diary popup ---
-
+  // Diary popup
   function showDiary() {
     const overlay = document.createElement('div');
     overlay.id = 'diary-overlay';
@@ -564,8 +552,7 @@
     document.body.appendChild(overlay);
   }
 
-  // --- Phone call mechanic ---
-
+  // Phone call mechanic
   const phoneContacts = {
     'Nate': 'Hey, haven\'t heard from Josh lately. He seemed stressed about something.',
     'Aliya': 'Josh has been acting strange. I hope he\'s okay.',
@@ -715,8 +702,7 @@
     phoneContainer.appendChild(backBtn);
   }
 
-  // --- Main showScene function ---
-
+  // Main showScene function
   function showScene(sceneKey, pushToHistory = true) {
     if (!sceneKey || !scenes[sceneKey]) {
       alert(`Scene "${sceneKey}" not found!`);
@@ -783,9 +769,12 @@
     if (scene.onEnter) scene.onEnter();
   }
 
-  // --- Location selector ---
+  // Helper functions
 
-  let locationSelector = null;
+  function allDiaryPiecesCollected() {
+    return diaryPiecesCollected.underBed && diaryPiecesCollected.inCloset && diaryPiecesCollected.park;
+  }
+
   function showLocationSelector() {
     if (!locationSelector) {
       locationSelector = document.createElement('div');
@@ -808,8 +797,6 @@
       locationSelector.appendChild(btn);
     });
   }
-
-  // --- Character intro popup ---
 
   function showCharacterIntro(name) {
     if (introducedCharacters.has(name)) return;
@@ -842,13 +829,9 @@
     }, 3000);
   }
 
-  // --- Update current character display ---
-
   function updateCurrentCharacter(name) {
     currentCharacterDiv.textContent = name ? `Current: ${name}` : '';
   }
-
-  // --- Back button ---
 
   let backButton = null;
   function createBackButton() {
@@ -865,8 +848,6 @@
     currentSceneKey = null;
     showScene(prevScene, false);
   }
-
-  // --- Info panel handlers ---
 
   function showInfo() {
     let html = '';
@@ -894,6 +875,9 @@
   });
   infoButton.addEventListener('click', showInfo);
 
-  // --- Start the game ---
+  // Initialize locationSelector variable for showLocationSelector
+  let locationSelector = null;
+
+  // Start the game
   showScene('start');
 })();
