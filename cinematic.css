@@ -65,12 +65,16 @@ body {
 }
 
 .glitch {
-  font-size: 1.5rem;
+  font-size: 24px; /* Will be dynamically adjusted */
   text-align: center;
   line-height: 1.4;
   animation: text-glitch 1s infinite;
   white-space: pre-wrap;
   text-shadow: 2px 2px #ff00ff;
+  max-height: 80vh;
+  overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 #flicker-overlay {
@@ -99,9 +103,9 @@ body {
   100% { transform: translate(1px, -2px); }
 }
 
-/* Responsive text scaling */
+/* Responsive font size fallback */
 @media (max-width: 600px) {
   .glitch {
-    font-size: 1.2rem;
+    font-size: 18px !important;
   }
 }
