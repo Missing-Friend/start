@@ -276,16 +276,22 @@
       ]
     },
     turnInDiary: {
-      character: 'Sergeant Miller',
-      location: 'Local Police Station',
-      text: `You hand over the diary to Sergeant Miller. He looks at it carefully and nods.\n\n"Thank you for bringing this in. This will help us a lot."\n\nYou can no longer read the diary now.`,
-      choices: [
-        { text: "Go back", next: "localpolicestation" }
-      ],
-      onEnter: () => {
-        diaryTurnedIn = true;
-        gatheredInfo.notes.push("Diary turned in to Sergeant Miller.");
-      }
+  character: 'Sergeant Miller',
+  location: 'Local Police Station',
+  text: `You hand over the diary to Sergeant Miller. He looks at it carefully and nods.\n\n"Thank you for bringing this in. This will help us a lot."\n\nYou can no longer read the diary now.`,
+  choices: [
+    { text: "Go back", next: "localpolicestation" }
+  ],
+  onEnter: () => {
+    diaryTurnedIn = true;
+    gatheredInfo.notes.push("Diary turned in to Sergeant Miller.");
+    // Redirect to cinematic page after a short delay for dramatic effect
+    setTimeout(() => {
+      window.location.href = 'ubegubewubgewbg.html';
+    }, 1500); // 1.5 seconds delay
+  }
+}
+
     },
     cafehevisits: {
       character: 'Barista',
