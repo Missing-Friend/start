@@ -65,7 +65,7 @@ body {
 }
 
 .glitch {
-  font-size: 24px; /* Will be dynamically adjusted */
+  font-size: 24px; /* Starting font size, dynamically adjusted by JS */
   text-align: center;
   line-height: 1.4;
   animation: text-glitch 1s infinite;
