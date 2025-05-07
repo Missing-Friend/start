@@ -23,18 +23,21 @@ AUTHORITY CLEARANCE REQUIRED: LEVEL 5\n
 `;
 
   let charIndex = 0;
-  const maxFontSize = 24; // in px
-  const minFontSize = 12; // in px
-  const maxHeight = window.innerHeight * 0.8; // 80% viewport height
+  const maxFontSize = 24; // starting font size in px
+  const minFontSize = 12; // minimum font size in px
+  const maxHeight = window.innerHeight * 0.8; // max allowed height for text container
 
+  // Initialize font size and clear text
   textElement.style.fontSize = maxFontSize + "px";
   textElement.textContent = "";
 
   function adjustFontSize() {
-    // Reduce font size if text height is too tall
     let fontSize = parseFloat(textElement.style.fontSize);
+    if (isNaN(fontSize)) fontSize = maxFontSize;
+
+    // Reduce font size by 1px steps while text height exceeds maxHeight and font size is above minimum
     while (textElement.scrollHeight > maxHeight && fontSize > minFontSize) {
-      fontSize -= 0.5;
+      fontSize -= 1;
       textElement.style.fontSize = fontSize + "px";
     }
   }
@@ -88,14 +91,14 @@ AUTHORITY CLEARANCE REQUIRED: LEVEL 5\n
     };
   }
 
-  // Start sequence
+  // Start the cinematic typing sequence
   typeText();
   ambientSound.volume = 0.2;
   heartbeatSound.volume = 0.25;
   ambientSound.play();
   heartbeatSound.play();
 
-  // Audio enable fallback
+  // Audio enable fallback for browsers that block autoplay
   document.body.addEventListener('click', () => {
     ambientSound.play();
     heartbeatSound.play();
