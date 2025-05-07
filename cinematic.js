@@ -36,25 +36,38 @@ AUTHORITY CLEARANCE REQUIRED: LEVEL 5\n
     function flashImage() {
         const img = new Image();
         img.src = 'https://i.pinimg.com/236x/9f/24/21/9f2421cc846c3b372c075a0f5a668b8e.jpg';
-        img.style.position = 'fixed';
-        img.style.top = '0';
-        img.style.left = '0';
-        img.style.width = '100vw';
-        img.style.height = '100vh';
-        img.style.zIndex = '1000';
-        document.body.appendChild(img);
 
-        staticSFX.currentTime = 0;
-        staticSFX.play();
-        flickerOverlay.style.opacity = '1';
+        img.onload = () => {
+            img.style.position = 'fixed';
+            img.style.top = '0';
+            img.style.left = '0';
+            img.style.width = '100vw';
+            img.style.height = '100vh';
+            img.style.zIndex = '1000';
+            img.style.opacity = '0';
+            img.style.pointerEvents = 'none';
+            img.style.transition = 'opacity 0.05s ease-in-out';
+            document.body.appendChild(img);
 
-        setTimeout(() => {
-            document.body.removeChild(img);
-            flickerOverlay.style.opacity = '0';
-            setTimeout(() => {
-                window.location.href = 'heefwuhuefw.html';
-            }, 200);
-        }, 50); // about 1 frame at 20fps
+            staticSFX.currentTime = 0;
+            staticSFX.play();
+            flickerOverlay.style.opacity = '1';
+
+            let flickerCount = 0;
+            const flickerInterval = setInterval(() => {
+                img.style.opacity = img.style.opacity === '1' ? '0' : '1';
+                flickerCount++;
+                if (flickerCount >= 10) { // flicker 10 times (~0.5s)
+                    clearInterval(flickerInterval);
+                    img.style.opacity = '0';
+                    flickerOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        document.body.removeChild(img);
+                        window.location.href = 'heefwuhuefw.html';
+                    }, 200);
+                }
+            }, 50);
+        };
     }
 
     // Start sequence
