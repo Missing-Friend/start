@@ -23,11 +23,27 @@ AUTHORITY CLEARANCE REQUIRED: LEVEL 5\n
 `;
 
   let charIndex = 0;
+  const maxFontSize = 24; // in px
+  const minFontSize = 12; // in px
+  const maxHeight = window.innerHeight * 0.8; // 80% viewport height
+
+  textElement.style.fontSize = maxFontSize + "px";
+  textElement.textContent = "";
+
+  function adjustFontSize() {
+    // Reduce font size if text height is too tall
+    let fontSize = parseFloat(textElement.style.fontSize);
+    while (textElement.scrollHeight > maxHeight && fontSize > minFontSize) {
+      fontSize -= 0.5;
+      textElement.style.fontSize = fontSize + "px";
+    }
+  }
 
   function typeText() {
     if (charIndex < storyText.length) {
       textElement.textContent += storyText[charIndex];
       charIndex++;
+      adjustFontSize();
       setTimeout(typeText, 40);
     } else {
       setTimeout(flashImage, 1500);
@@ -68,7 +84,7 @@ AUTHORITY CLEARANCE REQUIRED: LEVEL 5\n
             window.location.href = 'heefwuhuefw.html';
           }, 300);
         }
-      }, 80); // flicker every 80ms (~12 flickers ~1s)
+      }, 80);
     };
   }
 
