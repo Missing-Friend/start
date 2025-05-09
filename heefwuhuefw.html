@@ -3,15 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finding Josh - Critical Choices</title>
-    <link rel="stylesheet" href="pt.css">
+    <title>Search Interface</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #search-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #333;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        #search-form {
+            display: flex;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #url-input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            background: #444;
+            color: #fff;
+        }
+
+        #search-form button {
+            padding: 10px 20px;
+            background: #007bff;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 0 4px 4px 0;
+        }
+
+        #iframe-container {
+            position: relative;
+            top: 70px;
+            height: calc(100vh - 70px);
+            width: 100%;
+            background: #000;
+        }
+
+        #main-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .location-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            padding: 8px 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .location-dialogue {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            z-index: 2000;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .fade-out {
+            animation: fadeToBlack 2s forwards;
+        }
+
+        @keyframes fadeToBlack {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
 </head>
 <body>
-    <div class="crt-effect">
-        <div class="scanlines"></div>
-        <div class="glitch-overlay"></div>
-        <main id="game-screen"></main>
+    <div id="search-container">
+        <form id="search-form">
+            <input type="text" id="url-input" placeholder="Enter URL...">
+            <button type="submit">Go</button>
+        </form>
     </div>
-    <script src="pt.js"></script> <!-- Your JavaScript file -->
+
+    <div id="iframe-container">
+        <button id="location-button" class="location-button">Show Location</button>
+        <iframe id="main-iframe"></iframe>
+    </div>
+
+    <script>
+        const searchForm = document.getElementById('search-form');
+        const urlInput = document.getElementById('url-input');
+        const mainIframe = document.getElementById('main-iframe');
+        const locationButton = document.getElementById('location-button');
+        let timer;
+
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const url = urlInput.value.trim();
+            
+            if (url) {
+                // Reset previous state
+                locationButton.style.display = 'none';
+                clearTimeout(timer);
+                
+                // Handle URL input
+                const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+                mainIframe.src = fullUrl;
+
+                // Start 2-minute timer
+                timer = setTimeout(() => {
+                    document.body.classList.add('fade-out');
+                    setTimeout(() => {
+                        window.location.href = 'late.html';
+                    }, 2000);
+                }, 120000); // 2 minutes
+
+                // Check for gotube.com
+                if (new URL(fullUrl).hostname === 'gotube.com') {
+                    locationButton.style.display = 'block';
+                }
+            }
+        });
+
+        locationButton.addEventListener('click', () => {
+            showLocationDialogue();
+            clearTimeout(timer);
+        });
+
+        function showLocationDialogue() {
+            const dialogue = document.createElement('div');
+            dialogue.className = 'location-dialogue';
+            dialogue.innerHTML = `
+                <h3>Emergency Location</h3>
+                <p style="font-family: monospace;">34°42'03.5"N 135°49'16.6"E</p>
+                <p>"Please hurry... there's not much time..."</p>
+                <button onclick="this.parentElement.remove()" 
+                        style="margin-top: 15px; padding: 8px 20px; background: #007bff; border: none; color: white; border-radius: 4px; cursor: pointer;">
+                    I Understand
+                </button>
+            `;
+
+            document.body.appendChild(dialogue);
+        }
+    </script>
 </body>
 </html>
