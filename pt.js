@@ -193,7 +193,7 @@
     videoText.style.whiteSpace = 'pre-wrap';
     videoText.textContent =
 `If you're watching this, you're a good listener and you want to help...
-The only way to help is by going to this location (34°42'03.5"N 135°49'16.6"E)
+The only way to help is by going to this location (72°00'36.0"S 168°34'40.0"E)
 
 Please... there's not much time...`;
 
