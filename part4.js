@@ -802,6 +802,7 @@
     let deadline = 0;
     let current = null;
     let over = false;
+    let lastFail = null; // 'crack' or 'ledge': the obstacle you failed most recently
 
     // ----- Build the stage -----
     const hud = document.createElement('div');
@@ -930,6 +931,7 @@
           pulseClass(runner, current.type === 'crack' ? 'p4-jump' : 'p4-drop', 640);
         } else {
           slips++;
+          lastFail = current.type;
           renderSlips();
           pulseClass(runner, 'p4-stumble', 620);
           promptEl.textContent = action === 'late' ? 'TOO SLOW!' : 'WRONG MOVE!';
@@ -947,7 +949,7 @@
       promptEl.textContent = 'HE HAS YOU.';
       promptEl.classList.add('warn');
       chaser.style.left = '19%';
-      saveProgress({ chaseFailed: true, slips });
+      saveProgress({ chaseFailed: true, slips, failedObstacle: lastFail });
       setTimeout(() => fadeAndGo(ENDING_URL), 800);
     }
 
