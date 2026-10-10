@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Missing - Ending 2</title>
+  <link rel="stylesheet" href="ending2.css" />
+</head>
+<body>
+
+  <!-- Part 1: side view of the mistake (which version plays depends on what you missed) -->
+  <div id="e2-side">
+    <div class="e2-ground"></div>
+
+    <div id="e2-player" class="e2-figure">
+      <svg viewBox="0 0 60 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g class="e2-leg e2-leg-a"><rect x="17" y="80" width="11" height="46" rx="4" fill="#1c1f2a"/></g>
+        <g class="e2-leg e2-leg-b"><rect x="32" y="80" width="11" height="46" rx="4" fill="#1c1f2a"/></g>
+        <rect x="14" y="36" width="32" height="48" rx="10" fill="#2f6fd6"/>
+        <rect x="6" y="40" width="11" height="40" rx="5" fill="#2a63c2"/>
+        <rect x="43" y="40" width="11" height="40" rx="5" fill="#2a63c2"/>
+        <circle cx="11.5" cy="82" r="6.5" fill="#0b0b0f"/>
+        <circle cx="48.5" cy="82" r="6.5" fill="#0b0b0f"/>
+        <circle cx="30" cy="21" r="17" fill="#2f6fd6"/>
+        <circle cx="33" cy="23" r="11" fill="#e3b58c"/>
+        <circle class="e2-eye-open" cx="37" cy="22" r="1.5" fill="#222"/>
+        <path class="e2-eye-closed" d="M35.5 22 h3.5" stroke="#222" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+
+    <div id="e2-obstacle"></div>
+  </div>
+
+  <!-- Part 2: first-person view from the ground -->
+  <div id="e2-pov">
+    <div id="e2-world">
+      <div id="e2-glow"></div>
+      <div id="e2-snow"></div>
+
+      <div id="e2-man">
+        <svg viewBox="0 0 60 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <g><rect x="17" y="80" width="11" height="46" rx="4" fill="#030304"/></g>
+          <g><rect x="32" y="80" width="11" height="46" rx="4" fill="#030304"/></g>
+          <rect x="12" y="36" width="36" height="48" rx="10" fill="#030304" stroke="#1a1a24" stroke-width="1.5"/>
+          <rect x="4" y="40" width="11" height="40" rx="5" fill="#030304"/>
+          <rect x="45" y="40" width="11" height="40" rx="5" fill="#030304"/>
+          <circle cx="30" cy="21" r="15" fill="#030304" stroke="#1a1a24" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <div id="e2-knife"></div>
+    </div>
+    <div id="e2-vignette"></div>
+  </div>
+
+  <div id="e2-cover"></div>
+  <div id="e2-flash"></div>
+
+  <div id="e2-ending">
+    <p id="e2-text">Ending 2: You Died to The Man That Took Josh</p>
+    <button id="e2-retry">Try again</button>
+  </div>
+
+  <script src="ending2.js"></script>
+</body>
+</html>
