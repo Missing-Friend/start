@@ -234,13 +234,10 @@ Please... there's not much time...`;
     p.textContent = 'You have the location. Time to find Josh!';
     gameScreen.appendChild(p);
 
-    // TODO: Add next steps or scenes here as you want
-
     const nextBtn = document.createElement('button');
     nextBtn.textContent = 'Next';
     nextBtn.onclick = () => {
-      alert('Next part coming soon!');
-      // Replace with your next scene or function
+      window.location.href = 'part3.html';
     };
     gameScreen.appendChild(nextBtn);
   }
