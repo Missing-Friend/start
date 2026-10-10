@@ -9,7 +9,10 @@
   // ---------- Config ----------
   const P4_KEY = 'missing_part4';      // read: results saved by part 4
   const SAVE_KEY = 'missing_part5';    // write: results for part 6
-  const ENDING_URL = 'ending3.html';   // caught
+  // Which "caught" ending you get depends on where you slipped up
+  const ENDING_CELL = 'ending3.html';   // caught while still in your cell (the wall, the horn)
+  const ENDING_VENT = 'ending4.html';   // caught in the vent, or cut Josh loose too slowly
+  const ENDING_AMBUSH = 'ending5.html'; // your ambush failed
   const NEXT_PART_URL = 'part6.html';  // after the final choice
 
   const NOISE_LIMIT = 5;               // make this much noise and you are caught
@@ -35,7 +38,8 @@
     flags: Object.assign({}, p4.flags || {}),
     noise: Math.floor(Math.max(0, Number(p4.heat) || 0) / 4), // how much attention you have drawn here
     battery: 0,
-    sound: true
+    sound: true,
+    stage: 'cell' // 'cell' (your cell), 'vent' (the vent), 'josh' (Josh's cell)
   };
   const gatheredInfo = Array.isArray(p4.info) ? p4.info.slice() : [];
 
@@ -154,11 +158,36 @@
   function caughtEnding() {
     clearScreen();
     document.body.classList.remove('p5-horn');
-    addParagraphs([
-      'You never even hear the bolt. The door simply opens, and the light behind it is very bright, and very patient.'
-    ]);
-    saveProgress({ caught: true });
-    setTimeout(() => fadeAndGo(ENDING_URL), 1600);
+
+    let url;
+    let caughtAt;
+    let lines;
+
+    if (state.flags.failedAmbush) {
+      url = ENDING_AMBUSH;
+      caughtAt = 'ambush';
+      lines = [
+        'The bolt slides back. The door swings in. You swing the wrench with everything you have, and he is simply not where it lands.'
+      ];
+    } else if (state.flags.cutLate || state.stage === 'vent' || state.stage === 'josh') {
+      url = ENDING_VENT;
+      caughtAt = 'vent';
+      lines = [
+        state.flags.cutLate
+          ? 'The tie finally parts, and it is too late. Behind you, the whole vent fills with light.'
+          : 'A crash behind you. The grate you left hanging open swings wide, and the whole vent fills with light.'
+      ];
+    } else {
+      url = ENDING_CELL;
+      caughtAt = 'cell';
+      lines = [
+        'You never even hear the bolt. The door simply opens, and the light behind it is very bright, and very patient.'
+      ];
+    }
+
+    addParagraphs(lines);
+    saveProgress({ caught: true, caughtAt });
+    setTimeout(() => fadeAndGo(url), 1600);
   }
 
   // ---------- Sound (made with the browser, no audio files) ----------
@@ -651,6 +680,7 @@
   //  SCENE 4: The vent
   // =====================================================================
   function sceneVent() {
+    state.stage = 'vent';
     const f = state.flags;
     const lines = [];
 
@@ -680,6 +710,7 @@
   //  SCENE 5: Josh (the final choice of this part)
   // =====================================================================
   function sceneCell() {
+    state.stage = 'josh';
     clearScreen();
     addText('THE OTHER CELL', 'location-tag');
     addParagraphs([
