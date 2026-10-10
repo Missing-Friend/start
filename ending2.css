@@ -1,0 +1,300 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+body { --fig-h: clamp(130px, 30vh, 240px); }
+
+/* =====================================================
+   PART 1: SIDE VIEW
+   ===================================================== */
+#e2-side {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #05070d 0%, #0e1a29 55%, #1b2b3b 100%);
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#e2-side.visible { opacity: 1; }
+#e2-side.shake { animation: e2shake 0.35s linear; }
+
+@keyframes e2shake {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-9px, 4px); }
+  40%  { transform: translate(8px, -5px); }
+  60%  { transform: translate(-6px, 3px); }
+  80%  { transform: translate(4px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+
+.e2-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18%;
+  background: linear-gradient(180deg, #1b2735 0%, #0a0f17 100%);
+  border-top: 2px solid #26364a;
+}
+
+.e2-figure {
+  position: absolute;
+  bottom: 18%;
+  left: 12%;
+  height: var(--fig-h);
+  aspect-ratio: 60 / 130;
+  transform-origin: 50% 100%;
+}
+
+.e2-figure svg {
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+  display: block;
+}
+
+.e2-leg {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+
+.running .e2-leg-a { animation: e2swing 0.28s ease-in-out infinite alternate; }
+.running .e2-leg-b { animation: e2swing 0.28s ease-in-out infinite alternate-reverse; }
+
+@keyframes e2swing {
+  from { transform: rotate(-26deg); }
+  to   { transform: rotate(26deg); }
+}
+
+.e2-eye-closed { display: none; }
+.knocked .e2-eye-open { display: none; }
+.knocked .e2-eye-closed { display: block; }
+
+/* You did not drop under the ledge: your head takes it and you go over backwards */
+#e2-player { transition: transform 0.55s cubic-bezier(0.5, 0, 0.9, 0.6); }
+#e2-player.hit-head { transform: translateX(-34px) rotate(-80deg); }
+
+/* You did not jump the crack: your foot catches and you go down on your face */
+#e2-player.slip { transform: translateX(46px) rotate(84deg); }
+
+#e2-obstacle {
+  position: absolute;
+  left: 105%;
+  display: none;
+}
+
+#e2-obstacle.crack {
+  display: block;
+  bottom: calc(18% - 10px);
+  width: calc(var(--fig-h) * 0.9);
+  height: 22px;
+  background: #02050a;
+  clip-path: polygon(0 40%, 18% 0, 40% 60%, 62% 10%, 85% 55%, 100% 20%, 100% 100%, 0 100%);
+  box-shadow: 0 0 14px rgba(120, 190, 255, 0.5);
+}
+
+#e2-obstacle.ledge {
+  display: block;
+  bottom: calc(18% + var(--fig-h) * 0.72);
+  width: calc(var(--fig-h) * 1.1);
+  height: calc(var(--fig-h) * 0.32);
+  background: linear-gradient(180deg, #a9cde6 0%, #5f8fb0 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 62%, 88% 100%, 72% 60%, 55% 100%, 38% 58%, 22% 100%, 8% 62%, 0 70%);
+}
+
+/* =====================================================
+   PART 2: FIRST-PERSON VIEW
+   ===================================================== */
+#e2-pov {
+  position: fixed;
+  inset: 0;
+  background: #02040a;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+#e2-pov.on { opacity: 1; }
+
+/* The camera is lying on its side on the ice, swaying with your breathing */
+#e2-world {
+  position: absolute;
+  inset: -8%;
+  transform: rotate(-6deg);
+  animation: e2breathe 3.4s ease-in-out infinite alternate;
+}
+
+@keyframes e2breathe {
+  from { transform: rotate(-6deg) translateY(0) scale(1); }
+  to   { transform: rotate(-4deg) translateY(10px) scale(1.02); }
+}
+
+#e2-glow {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  width: 90%;
+  height: 80%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at 50% 70%, rgba(110, 150, 190, 0.28) 0%, rgba(40, 60, 90, 0.12) 45%, transparent 70%);
+}
+
+#e2-snow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 36%;
+  background: linear-gradient(180deg, rgba(60, 85, 110, 0.35) 0%, rgba(14, 22, 32, 0.9) 100%);
+}
+
+#e2-man {
+  position: absolute;
+  left: 50%;
+  bottom: 38%;
+  height: 74vh;
+  aspect-ratio: 60 / 130;
+  transform: translateX(-50%) scale(0.16);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  transition: opacity 2.5s ease, transform 2.6s ease-in-out;
+}
+
+#e2-man svg {
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+  display: block;
+}
+
+#e2-man.show { opacity: 1; }
+#e2-man.approach { transform: translateX(-50%) scale(0.5); }
+#e2-man.lunge {
+  transform: translateX(-50%) translateY(6vh) scale(3.4);
+  transition: transform 0.35s cubic-bezier(0.6, 0, 1, 0.6);
+}
+
+/* The blade rises toward your face */
+#e2-knife {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 9vh;
+  height: 44vh;
+  transform: translate(-50%, 46vh) scale(0.35);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  background: linear-gradient(90deg, #6e7683 0%, #e8edf5 45%, #aab2c0 100%);
+  clip-path: polygon(50% 0, 100% 72%, 66% 100%, 34% 100%, 0 72%);
+  transition: opacity 0.6s ease, transform 0.9s ease-out;
+}
+
+#e2-knife.show {
+  opacity: 0.9;
+  transform: translate(-50%, 30vh) scale(0.5);
+}
+
+#e2-knife.thrust {
+  opacity: 1;
+  transform: translate(-50%, -8vh) scale(2.1);
+  transition: transform 0.3s cubic-bezier(0.5, 0, 1, 0.6);
+}
+
+/* Blurred, dark edges like a blurry, dazed view */
+#e2-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(0, 0, 0, 0.85) 100%);
+  animation: e2blur 4s ease-in-out infinite alternate;
+}
+
+@keyframes e2blur {
+  from { opacity: 0.85; }
+  to   { opacity: 1; }
+}
+
+/* =====================================================
+   OVERLAYS AND THE ENDING TEXT
+   ===================================================== */
+#e2-cover {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity 0.5s ease;
+}
+
+#e2-cover.on { opacity: 1; }
+#e2-cover.slow { transition: opacity 0.9s ease; }
+
+#e2-flash {
+  position: fixed;
+  inset: 0;
+  background-color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+
+#e2-flash.small { animation: e2small 0.25s ease-out; }
+
+@keyframes e2small {
+  0%   { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* The big flash: instantly white, then it bleeds into red */
+#e2-flash.big { opacity: 1; }
+#e2-flash.red {
+  background-color: #8a0000;
+  transition: background-color 2.6s ease;
+}
+
+#e2-ending {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+#e2-text {
+  margin: 0;
+  max-width: 28em;
+  color: #000;
+  font-size: clamp(1.4rem, 4.5vw, 2.6rem);
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+
+#e2-text.show { opacity: 1; }
+
+#e2-retry {
+  opacity: 0;
+  padding: 0.7em 1.6em;
+  font-size: 1rem;
+  color: #000;
+  background: transparent;
+  border: 1px solid #000;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 2s ease, background 0.2s, color 0.2s;
+}
+
+#e2-retry.show { opacity: 1; pointer-events: auto; }
+#e2-retry:hover { background: #000; color: #8a0000; }
