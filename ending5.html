@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Missing - Ending 5</title>
+  <link rel="stylesheet" href="ending5.css" />
+</head>
+<body>
+
+  <div id="e5-scene">
+    <div id="e5-ground"></div>
+
+    <!-- The door the man is about to open -->
+    <div id="e5-door"><div id="e5-gap"></div></div>
+
+    <!-- The man that took Josh -->
+    <div id="e5-man" class="e5-figure">
+      <svg viewBox="0 0 60 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g><rect x="17" y="80" width="11" height="46" rx="4" fill="#030304"/></g>
+        <g><rect x="32" y="80" width="11" height="46" rx="4" fill="#030304"/></g>
+        <rect x="12" y="36" width="36" height="48" rx="10" fill="#030304" stroke="#14141b" stroke-width="1.5"/>
+        <rect x="4" y="40" width="11" height="40" rx="5" fill="#030304"/>
+        <rect x="45" y="40" width="11" height="40" rx="5" fill="#030304"/>
+        <circle cx="30" cy="21" r="15" fill="#030304" stroke="#14141b" stroke-width="1.5"/>
+      </svg>
+    </div>
+
+    <!-- You, with the wrench -->
+    <div id="e5-player" class="e5-figure">
+      <svg viewBox="0 0 60 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g><rect x="17" y="80" width="11" height="46" rx="4" fill="#1c1f2a"/></g>
+        <g><rect x="32" y="80" width="11" height="46" rx="4" fill="#1c1f2a"/></g>
+        <rect x="14" y="36" width="32" height="48" rx="10" fill="#2f6fd6"/>
+        <rect x="6" y="40" width="11" height="40" rx="5" fill="#2a63c2"/>
+        <rect x="43" y="40" width="11" height="40" rx="5" fill="#2a63c2"/>
+        <circle cx="11.5" cy="82" r="6.5" fill="#0b0b0f"/>
+        <circle cx="48.5" cy="82" r="6.5" fill="#0b0b0f"/>
+        <circle cx="30" cy="21" r="17" fill="#2f6fd6"/>
+        <circle cx="33" cy="23" r="11" fill="#e3b58c"/>
+        <circle cx="37" cy="22" r="1.5" fill="#222"/>
+      </svg>
+      <div id="e5-pivot"><div id="e5-wrench"></div></div>
+    </div>
+
+    <div id="e5-fallen"></div>
+  </div>
+
+  <div id="e5-line">Philip.</div>
+
+  <div id="e5-ending">
+    <p id="e5-text">Ending 5: He Was Ready</p>
+    <button id="e5-retry">Try again</button>
+  </div>
+
+  <script src="ending5.js"></script>
+</body>
+</html>
