@@ -1,0 +1,65 @@
+/* Part 3 additions. Loaded after style.css, so these only layer on top of it. */
+
+body.part3 {
+  background: linear-gradient(180deg, #0b1a2b 0%, #1d3a57 60%, #cfe6f5 100%);
+  color: #eaf4fb;
+}
+
+/* Blizzard overlay */
+body.part3::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(3px 3px at 40% 80%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 85% 20%, rgba(255,255,255,0.8), transparent);
+  background-size: 300px 300px;
+  animation: snowfall 6s linear infinite;
+  z-index: 0;
+}
+
+@keyframes snowfall {
+  from { background-position: 0 0; }
+  to   { background-position: -120px 300px; }
+}
+
+#game-container {
+  position: relative;
+  z-index: 1;
+}
+
+#game-screen button {
+  display: block;
+  margin: 0.6em 0;
+}
+
+#game-screen .location-tag {
+  font-size: 0.85em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* Countdown shown in #current-character */
+.blizzard-timer {
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.blizzard-timer.urgent {
+  color: #ff6b6b;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.4; }
+}
+
+#info-content .info-entry {
+  margin: 0.5em 0;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
