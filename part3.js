@@ -12,7 +12,7 @@
   const ENDING_URL = 'ending1.html'; // sent here if you get too far from Josh
   const NEXT_PART_URL = 'part4.html';// sent here after the last question
   const SHOW_TRAIL = false;          // true shows a "Trail:" hint under the title (much easier)
-  const SAVE_KEY = 'missing_part3';  // localStorage key so part 4 can read your results
+  const SAVE_KEY = 'missing_part3';  // localStorage key so part 4 can read your result
 
   // ---------- Game state ----------
   const state = {
