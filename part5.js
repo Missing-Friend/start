@@ -16,12 +16,6 @@
   const DRAIN_MS = 1500;               // phone battery drops 1% this often while the light is on
   const EXAMINE_COST = 2;              // extra battery % spent each time you search something
 
-  const TAP_GAP = 330;                 // ms between taps in a burst
-  const PAIR_GAP = 900;                // ms between the row burst and the column burst
-  const LETTER_GAP = 1700;             // ms between letters
-
-  const GRID = ['ABCDE', 'FGHIJ', 'LMNOP', 'QRSTU', 'VWXYZ']; // tap code (K = C)
-
   // ---------- Load part 4 results ----------
   function loadPart4() {
     try {
@@ -82,15 +76,7 @@
   closeInfo.onclick = () => { infoPanel.style.display = 'none'; };
 
   // ---------- Helpers ----------
-  let tapTimers = [];
-
-  function stopTaps() {
-    tapTimers.forEach(clearTimeout);
-    tapTimers = [];
-  }
-
   function clearScreen() {
-    stopTaps();
     gameScreen.innerHTML = '';
   }
 
@@ -115,6 +101,7 @@
     return btn;
   }
 
+  // Choices appear in a random order
   function addChoices(list) {
     const copy = list.slice();
     for (let i = copy.length - 1; i > 0; i--) {
@@ -122,31 +109,6 @@
       [copy[i], copy[j]] = [copy[j], copy[i]];
     }
     copy.forEach(c => addButton(c.label, c.run));
-  }
-
-  function addInput(placeholder, onSubmit, opts) {
-    const options = opts || {};
-    const row = document.createElement('div');
-    row.className = 'p5-input-row';
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = placeholder;
-    input.autocomplete = 'off';
-    if (options.maxLength) input.maxLength = options.maxLength;
-    const btn = document.createElement('button');
-    btn.textContent = options.button || 'Enter';
-    const submit = () => {
-      const value = input.value.trim();
-      if (!value) return;
-      onSubmit(value, input);
-    };
-    btn.onclick = submit;
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
-    row.appendChild(input);
-    row.appendChild(btn);
-    gameScreen.appendChild(row);
-    input.focus();
-    return { input, button: btn, row };
   }
 
   // If you have made too much noise, the next step is the ending instead
@@ -210,24 +172,6 @@
     }
     if (audioCtx.state === 'suspended') audioCtx.resume();
     return audioCtx;
-  }
-
-  function thump(freq, volume) {
-    if (!state.sound) return;
-    const ctx = getCtx();
-    if (!ctx) return;
-    const t = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, t);
-    osc.frequency.exponentialRampToValueAtTime(freq * 0.5, t + 0.12);
-    gain.gain.setValueAtTime(volume || 0.7, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(t);
-    osc.stop(t + 0.16);
   }
 
   function hornSound() {
@@ -366,27 +310,21 @@
 
     const spots = [
       {
-        id: 'grid', cls: 'grid', x: 6, y: 14, w: 22, h: 38,
+        id: 'scratch', cls: 'scratch', x: 6, y: 14, w: 22, h: 34,
         build: (el) => {
-          GRID.join('').split('').forEach(ch => {
-            const s = document.createElement('span');
-            s.textContent = ch;
-            el.appendChild(s);
+          ['DON\'T SHOUT.', 'HE HEARS', 'EVERYTHING.'].forEach(line => {
+            const d = document.createElement('div');
+            d.textContent = line;
+            el.appendChild(d);
           });
         },
         text: [
-          'Scratched into the stone, five rows of five letters. No K. Below it, in smaller scratches: "Down, then across."'
+          'Words scratched into the stone in ragged, shaky letters an inch high: "DON\'T SHOUT. HE HEARS EVERYTHING."',
+          'Underneath, a small drawing of a fist, as if to say: knock instead.'
         ],
         apply: () => {
-          setFlags({ gotGrid: true });
-          addInfo([
-            'A letter grid is scratched into the cell wall (no K). Under it: "Down, then across."',
-            'A  B  C  D  E',
-            'F  G  H  I  J',
-            'L  M  N  O  P',
-            'Q  R  S  T  U',
-            'V  W  X  Y  Z'
-          ]);
+          setFlags({ gotWarning: true });
+          addInfo('Scratched on the cell wall: "Don\'t shout. He hears everything." Under it, a drawing of a fist.');
         }
       },
       {
@@ -440,7 +378,6 @@
     const dark = document.createElement('div');
     dark.className = 'p5-dark';
 
-    const spotEls = {};
     spots.forEach(spot => {
       const el = document.createElement('div');
       el.className = 'p5-hs p5-hs-' + spot.cls;
@@ -451,7 +388,6 @@
       if (spot.build) spot.build(el);
       el.addEventListener('click', () => examine(spot, el));
       room.appendChild(el);
-      spotEls[spot.id] = el;
     });
     room.appendChild(dark);
 
@@ -581,219 +517,50 @@
   }
 
   // =====================================================================
-  //  Tap code helpers
-  // =====================================================================
-  function coords(ch) {
-    const c = ch === 'K' ? 'C' : ch;
-    for (let r = 0; r < GRID.length; r++) {
-      const col = GRID[r].indexOf(c);
-      if (col >= 0) return [r + 1, col + 1];
-    }
-    return null;
-  }
-
-  function normalizeLetters(text, max) {
-    return text.toUpperCase().replace(/[^A-Z]/g, '').replace(/K/g, 'C').slice(0, max || 8);
-  }
-
-  // Builds one box per letter: [row dots] | [column dots]
-  function buildLetterBoxes(word, mine) {
-    const wrap = document.createElement('div');
-    wrap.className = 'p5-letters';
-    const boxes = [];
-    word.split('').forEach(() => {
-      const box = document.createElement('div');
-      box.className = 'p5-letter' + (mine ? ' mine' : '');
-      const r = document.createElement('span');
-      r.className = 'p5-r';
-      const sep = document.createElement('span');
-      sep.className = 'p5-sep';
-      sep.textContent = ' | ';
-      const c = document.createElement('span');
-      c.className = 'p5-c';
-      box.appendChild(r);
-      box.appendChild(sep);
-      box.appendChild(c);
-      wrap.appendChild(box);
-      boxes.push({ box, r, c });
-    });
-    return { wrap, boxes };
-  }
-
-  // Plays the taps (sound + dots) for a word and returns how long it takes in ms
-  function playWord(word, boxes, freq) {
-    stopTaps();
-    boxes.forEach(b => { b.r.textContent = ''; b.c.textContent = ''; });
-
-    let t = 400;
-    word.split('').forEach((ch, i) => {
-      const pair = coords(ch);
-      if (!pair) return;
-      const [row, col] = pair;
-
-      for (let n = 0; n < row; n++) {
-        t += TAP_GAP;
-        tapTimers.push(setTimeout(() => {
-          thump(freq, 0.7);
-          boxes[i].r.textContent += '●';
-          boxes[i].box.classList.add('flash');
-          setTimeout(() => boxes[i].box.classList.remove('flash'), 120);
-        }, t));
-      }
-
-      t += PAIR_GAP;
-
-      for (let n = 0; n < col; n++) {
-        t += TAP_GAP;
-        tapTimers.push(setTimeout(() => {
-          thump(freq, 0.7);
-          boxes[i].c.textContent += '●';
-          boxes[i].box.classList.add('flash');
-          setTimeout(() => boxes[i].box.classList.remove('flash'), 120);
-        }, t));
-      }
-
-      t += LETTER_GAP;
-    });
-
-    return t;
-  }
-
-  function gridReference() {
-    if (state.flags.gotGrid) {
-      const pre = document.createElement('div');
-      pre.className = 'p5-gridref';
-      pre.textContent = GRID.map(row => row.split('').join(' ')).join('\n');
-      gameScreen.appendChild(pre);
-    } else {
-      addText('You never found the grid on the wall. All you can remember is how it starts: A B C D E. The rest is up to you.');
-    }
-  }
-
-  // Josh taps a word. You work out what it says and type it in.
-  function decodeWord(word, introLines, onDone) {
-    clearScreen();
-    addText('THE WALL', 'location-tag');
-    addParagraphs(introLines);
-    addText('Each letter is two bursts of taps: first the row, then the column.');
-    gridReference();
-
-    const letters = buildLetterBoxes(word, false);
-    gameScreen.appendChild(letters.wrap);
-
-    let busy = true;
-    let tries = 0;
-    const feedback = addText('', 'p5-feedback');
-
-    const replayBtn = addButton('Listen again', () => {
-      if (busy) return;
-      busy = true;
-      const ms = playWord(word, letters.boxes, 110);
-      tapTimers.push(setTimeout(() => { busy = false; }, ms));
-    });
-
-    addInput('What did he say?', (value) => {
-      const answer = value.toUpperCase().replace(/[^A-Z]/g, '');
-      if (answer === word) {
-        stopTaps();
-        onDone();
-        return;
-      }
-      tries++;
-      feedback.textContent = tries >= 3
-        ? `That's not it. The word starts with ${word[0]}.`
-        : 'That is not what he said.';
-    }, { maxLength: 12, button: 'Decode' });
-
-    replayBtn.disabled = false;
-    const ms = playWord(word, letters.boxes, 110);
-    tapTimers.push(setTimeout(() => { busy = false; }, ms));
-  }
-
-  // =====================================================================
-  //  SCENE 2: The wall (Josh taps, you decode and reply)
+  //  SCENE 2: The wall (Josh is on the other side)
   // =====================================================================
   function sceneWall() {
     clearScreen();
     addText('THE WALL', 'location-tag');
     addParagraphs([
-      'You sit with your back against the cold. And then it comes, through the stone behind your head: tap, tap-tap, tap.',
+      'You sit with your back against the cold stone. Then, very softly, from the other side: tap, tap-tap, tap.',
       state.flags.followedTapping
         ? 'The old rhythm. The one you followed through the dark below deck. He is here.'
         : 'A rhythm, patient and deliberate, repeating.',
-      'Then it changes. Slow pairs of taps with long silences between them. It is not a rhythm anymore. It is a message.',
-      state.flags.gotCloth ? 'The knotted cloth is in your fist. You do not remember picking it up.' : null
+      'A moment later, a muffled voice, so quiet you almost take it for your own thoughts: "Philip? Philip, is that you?"',
+      state.flags.gotWarning ? 'You remember the scratched words on the wall. Don\'t shout.' : null
     ]);
-    addButton('Listen', () => go(wallFirst));
-  }
 
-  function wallFirst() {
-    decodeWord('PHIL', [
-      'Taps come through the wall. Slow. Careful. Somebody who knows how loud a whisper can be.'
-    ], () => {
-      addInfo('Josh tapped through the wall: PHIL.');
-      go(wallReply);
-    });
-  }
-
-  let replyMisses = 0;
-
-  function wallReply() {
-    clearScreen();
-    addText('THE WALL', 'location-tag');
-    addParagraphs([
-      'PHIL. Just your name, with a question in the silence after it. He is asking whether it is really you.',
-      'You can only answer the way he asked: through the wall, one letter at a time. Tap your answer.'
-    ]);
-    const feedback = addText('', 'p5-feedback');
-    let sent = false;
-
-    addInput('Your reply', (value, input) => {
-      if (sent) return;
-      const word = normalizeLetters(value, 8);
-      if (!word) return;
-
-      const accepted = /YES|YEP|YEAH|PHIL|HERE|ME|OC/.test(word) || word === 'IM' || word === 'IAM';
-      if (!accepted) {
-        addNoise(1);
-        replyMisses++;
-        if (replyMisses < 2) {
-          feedback.textContent = 'You tap it out. Silence. Then, from the corridor, a chair scrapes. Josh did not understand you.';
-          return;
+    addChoices([
+      {
+        label: 'Whisper back: "It\'s me."',
+        run: () => {
+          addNoise(1);
+          showResult([
+            'Your whisper sounds like a shout in the quiet. "Shh!" Josh hisses through the stone. In the corridor, a chair scrapes, then goes still.',
+            'You both hold your breath until your lungs hurt. Nobody comes. Not yet.'
+          ], wallMessage);
+        }
+      },
+      {
+        label: 'Knock back once, softly.',
+        run: () => {
+          showResult([
+            state.flags.followedTapping
+              ? 'One soft knock. A pause. Then one soft knock answers, and you can almost hear him exhale. He knows your knock.'
+              : 'One soft knock. A long pause. Then one soft knock answers, hesitant, as if he is afraid to believe it.'
+          ], wallMessage);
         }
       }
-
-      sent = true;
-      input.disabled = true;
-      const letters = buildLetterBoxes(word, true);
-      gameScreen.appendChild(letters.wrap);
-      const ms = playWord(word, letters.boxes, 190);
-      tapTimers.push(setTimeout(() => {
-        showResult([
-          accepted
-            ? 'A pause. Then a single soft tap comes back, so quiet you almost miss it. He believes you.'
-            : 'A long silence. Then a single tap, reluctantly. He answers anyway, braver than you deserve.'
-        ], wallSecond);
-      }, ms + 600));
-    }, { maxLength: 24, button: 'Tap it out' });
+    ]);
   }
 
-  function wallSecond() {
-    decodeWord('VENT', [
-      'He is tapping again, faster now. He has been waiting a long time to tell someone this.'
-    ], () => {
-      addInfo('Josh tapped through the wall: VENT.');
-      go(wallThird);
-    });
-  }
-
-  function wallThird() {
-    decodeWord('HORN', [
-      'VENT. And then a long pause. One more word.'
-    ], () => {
-      addInfo('Josh tapped through the wall: HORN.');
-      go(sceneHorn);
-    });
+  function wallMessage() {
+    addInfo('Josh whispered through the wall: use the vent, but only when the horn goes.');
+    showResult([
+      '"Listen," Josh whispers, fast and low. "There is a vent in your wall. It runs to mine. When the horn goes, the corridor empties. Not before. If you go early, he hears you. Wait for the horn, then come to me."',
+      'You hear him swallow. "Please don\'t be early."'
+    ], sceneHorn);
   }
 
   // =====================================================================
@@ -803,7 +570,7 @@
     clearScreen();
     addText('THE LISTENING', 'location-tag');
     addParagraphs([
-      'VENT. HORN. Josh does not say what happens when the horn sounds. He does not have to.',
+      'The vent, but only when the horn sounds. Josh did not say why. He did not have to.',
       state.flags.gotSlot
         ? 'Two men said it plainly through the door: when the horn goes, the corridor empties.'
         : 'You do not know what the horn means, only that Josh wants you to wait for it.',
