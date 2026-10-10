@@ -7,11 +7,11 @@
   const closeInfo = document.getElementById('close-info');
 
   // ---------- Config ----------
-  const START_DISTANCE = 2;          // how far from Josh you begin
+  const START_DISTANCE = 3;          // how far from Josh you begin
   const MAX_DISTANCE = 6;            // reach this and the trail is lost for good
   const ENDING_URL = 'ending1.html'; // sent here if you get too far from Josh
   const NEXT_PART_URL = 'part4.html';// sent here after the last question
-  const SHOW_TRAIL = true;           // set to false to hide the "Trail:" status
+  const SHOW_TRAIL = false;          // true shows a "Trail:" hint under the title (much easier)
   const SAVE_KEY = 'missing_part3';  // localStorage key so part 4 can read your results
 
   // ---------- Game state ----------
@@ -75,6 +75,16 @@
     return btn;
   }
 
+  // Choices appear in a random order so the answer is never in the same spot
+  function shuffle(list) {
+    const copy = list.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
   function trailLabel() {
     const labels = ['Right behind him', 'Close', 'Warm', 'Cooling', 'Cold', 'Almost lost'];
     return labels[Math.min(state.distance, labels.length - 1)];
@@ -127,7 +137,7 @@
     if (scene.tag) addText(scene.tag, 'location-tag');
     addParagraphs(scene.text(state));
     addText('What do you do?');
-    scene.choices.forEach(choice => {
+    shuffle(scene.choices).forEach(choice => {
       addButton(choice.label, () => resolveChoice(choice));
     });
   }
@@ -146,7 +156,7 @@
 
     // Too far from Josh: the trail is lost
     if (state.distance >= MAX_DISTANCE) {
-      addText('You have gone too far in the wrong direction. The trail is gone, and so is any chance of reaching Josh in time.');
+      addText('Somewhere along the way, the trail stopped being a trail. You can feel it. There is nothing left to follow, and you are not alone out here.');
       addButton('Continue', () => fadeAndGo(ENDING_URL));
       return;
     }
@@ -161,76 +171,73 @@
   // ---------- The story ----------
   const scenes = {
 
-    // 1. The flight: trusting the pilot gives you clues for later
+    // 1. The flight
     pilot: {
       tag: 'THE FLIGHT SOUTH',
       text: () => [
-        'The only pilot willing to fly to those coordinates this time of year is a tired man in a patched jacket. Halfway across the ice, he finally asks the question you knew was coming: "What\'s out there for you?"'
+        'The only pilot willing to fly to those coordinates this late in the season is a tired man in a patched jacket. Somewhere over the ice, he asks without looking at you: "Family? Or business?"'
       ],
       choices: [
         {
-          label: 'Tell him the truth: your friend is missing and this is where he pointed you.',
+          label: 'Tell him about Josh.',
           resolve: () => ({
             distance: -1,
             flags: { trustPilot: true },
             text: [
-              'He is quiet for a long moment. Then he tells you he flew two men to the old survey camp two days ago.',
-              '"The younger one kept stumbling," he says. "He dropped little orange flags in the snow when he thought nobody was watching. And there\'s a ship in the bay with a red stripe on the hull, lit up like Christmas. Nobody has any business being out here right now."'
+              'He doesn\'t answer right away. When he does, he talks to the windshield.',
+              '"Two passengers, three days back. One of them walked like his boots were on the wrong feet. The other never looked at him once." He adjusts a dial that doesn\'t need adjusting. "There\'s a vessel out in the bay that hasn\'t gone dark since."'
             ],
             info: [
-              'The pilot flew two men to the survey camp two days ago. One could barely walk.',
-              'Josh dropped orange flags in the snow along the way.',
-              'A ship with a red stripe on its hull is anchored in the bay, with every light on.'
+              'The pilot flew two passengers to the coast three days ago. One walked strangely.',
+              'A vessel in the bay has had its lights on ever since.'
             ],
             next: 'drop'
           })
         },
         {
-          label: 'Tell him you\'re a researcher and leave it at that.',
+          label: 'Say you\'re meeting colleagues.',
           resolve: () => ({
             distance: 1,
             flags: { lied: true },
             text: [
-              '"Sure you are," he says, and doesn\'t say another word for the rest of the flight.',
-              'He knows something. You can feel it. But you\'ve given him no reason to share it.'
+              '"Colleagues," he repeats, like he\'s tasting the word. He says nothing else until the landing strip appears.'
             ],
-            info: 'The pilot seemed to know something, but you did not earn his trust.',
             next: 'drop'
           })
         }
       ]
     },
 
-    // 2. The drop point: orange flags vs. snowmobile tracks
+    // 2. The drop point
     drop: {
       tag: 'THE DROP POINT',
       text: (s) => [
-        'The plane is gone within minutes. The wind is brutal and the ice goes on forever. You check the coordinates twice. This is the spot.',
-        'Two trails lead away from the landing strip. One is a set of fresh snowmobile tracks, clean and deep, heading toward the cliffs. The other is a faint line of small orange flags half buried in the snow, running along the ridge. Around the nearest flag, someone has tied a strip of cloth with a ridiculous double knot, the way Josh ties everything.',
-        s.flags.trustPilot ? 'The pilot\'s words come back to you. Orange flags, dropped when nobody was watching.' : 'You have nothing to go on except what you can see.'
+        'The plane is gone within minutes. Wind. White. You check the coordinates twice, then a third time.',
+        'A line of snowmobile tracks cuts toward a dark shape on the cliffs, deep and recent. To the south, a row of orange markers pokes out of the snow along the ridge, spaced too evenly to be weather. Around one of the stakes, a strip of cloth is knotted. It could be anything.',
+        s.flags.trustPilot ? 'You think about the two passengers, and about whether one of them might have wanted to leave something behind.' : null
       ],
       choices: [
         {
-          label: 'Follow the orange flags along the ridge.',
+          label: 'Follow the markers along the ridge.',
           resolve: () => ({
             distance: -1,
             flags: { followedFlags: true },
             text: [
-              'You find the next flag, then the next. Every one is knotted with the same double knot. Josh is leading you somewhere.',
-              'After an hour of walking into the wind, a small hut appears out of the white.'
+              'The cloth is knotted again at the next stake. And the next. Always the same clumsy double knot, as if whoever tied them was in a hurry and didn\'t trust a single loop.',
+              'After an hour, a hut appears out of the white.'
             ],
-            info: 'Josh marked the way with orange flags, each one tied with his double knot.',
+            info: 'Orange markers run along the ridge, each with a strip of knotted cloth.',
             next: 'hut'
           })
         },
         {
-          label: 'Follow the fresh snowmobile tracks toward the cliffs.',
+          label: 'Follow the tracks toward the dark shape on the cliffs.',
           resolve: () => ({
             distance: 1,
             flags: { lostTime: true },
             text: [
-              'The tracks are clean and easy to follow, and that should have been your first warning.',
-              'They end at an abandoned snowmobile with an empty tank, parked at the edge of the cliffs. No one is here. No one has been here for a while.'
+              'The shape on the cliffs is an abandoned supply depot, half buried in drift. The tracks end at a snowmobile with an empty tank.',
+              'No one has been here for a while.'
             ],
             next: 'detourTracks'
           })
@@ -240,115 +247,109 @@
 
     // Detour: wrong choice at the drop point
     detourTracks: {
-      tag: 'THE DEAD END',
+      tag: 'THE DEPOT',
       text: () => [
-        'You are cold, you are tired, and you have wasted hours. When you look back the way you came, you catch a glint of orange far along the ridge. The flags. You walked right past them.'
+        'Inside: empty shelves, a dead stove, a calendar from two winters ago. Through a cracked window you can see the ridge, a long way off, and a thin orange line along it that you passed on the way here.',
+        'The light is already starting to go.'
       ],
       choices: [
         {
-          label: 'Go back and pick up the orange flags.',
+          label: 'Search the rest of the depot.',
+          resolve: () => ({
+            distance: 2,
+            text: [
+              'Under the floorboards: rust and a mouse nest. By the time you come out, the light is gone and the wind has erased your own footprints.',
+              'You find the ridge again by luck, and a hut by accident.'
+            ],
+            next: 'hut'
+          })
+        },
+        {
+          label: 'Head back toward the ridge while there is still light.',
           resolve: () => ({
             distance: -1,
             flags: { followedFlags: true },
             text: [
-              'It costs you time you don\'t have, but you find the flags again. The double knots are there, one after another. Josh was here.',
-              'A small hut appears out of the white, and you push toward it.'
+              'You retrace your steps in the fading light. The orange line is where you left it, knotted cloth and all.',
+              'A hut takes shape in the white.'
             ],
-            info: 'Josh marked the way with orange flags, each one tied with his double knot.',
-            next: 'hut'
-          })
-        },
-        {
-          label: 'Search the snowmobile and keep going past the cliffs.',
-          resolve: () => ({
-            distance: 2,
-            text: [
-              'The snowmobile is stripped of anything useful. You push on past the cliffs for hours until the ice stops making sense.',
-              'You turn back too late. Eventually you stumble onto the ridge, and the flags, and a small hut, but your phone is nearly dead and your hands are numb.'
-            ],
+            info: 'Orange markers run along the ridge, each with a strip of knotted cloth.',
             next: 'hut'
           })
         }
       ]
     },
 
-    // 3. The hut: using the radio the wrong way tips off the man
+    // 3. The hut
     hut: {
       tag: 'THE SURVEY HUT',
       text: () => [
-        'The hut is cold and dark, but someone has been here recently. A handheld radio sits on the desk. Taped to its back is a scrap of paper in Josh\'s handwriting: "Philip. Don\'t use the main channel. He listens."',
-        'Below the note, scratched into the casing with a key, is the number 7.'
+        'The hut is cold, and the cold is wrong somehow. Not old cold. A kettle on the stove is still faintly warm.',
+        'A handheld radio sits on the desk, its dial set to 1. A laminated card beside it reads EMERGENCY, CH. 1. On the back of the casing, scratched with a key, is the number 7. Under the radio, a scrap of paper in handwriting you know: "Listen first."'
       ],
       choices: [
         {
-          label: 'Call out on the main emergency channel and hope someone answers.',
+          label: 'Use the emergency channel.',
           resolve: () => ({
             distance: 2,
             flags: { broadcast: true },
             text: [
-              'Static. Then, very faintly, a click: someone on the other end picking up. They don\'t answer. They just listen.',
-              'You switch the radio off, but it\'s too late. Somebody knows you are here.'
+              'Static, then a click. Someone on the other end picks up. They don\'t speak. You can hear breathing, calm and unhurried, and then the line goes dead.',
+              'You tell yourself it was nothing.'
             ],
-            info: 'You used the main radio channel. Someone heard you.',
+            info: 'Someone answered the emergency channel and said nothing.',
             next: 'map'
           })
         },
         {
-          label: 'Tune the radio to the channel Josh scratched into the casing.',
+          label: 'Use the channel scratched into the casing.',
           resolve: () => ({
             distance: -1,
             flags: { radioClue: true },
             text: [
-              'Channel 7 is silent for a moment. Then a recording crackles through. It is Josh, rushed and low.',
-              '"If you\'re hearing this, you listened. Good. There are two places on the map, but only one is real. I\'m going where the light doesn\'t turn off."',
-              'The message loops once and goes quiet.'
+              'Channel 7 hisses, then a recording starts. Josh, low and fast: "Two places on the map. Only one is real. Go where the light doesn\'t blink."',
+              'It loops once and stops.'
             ],
-            info: 'Josh\'s radio message: "Two places on the map. Only one is real. I\'m going where the light doesn\'t turn off."',
+            info: 'Josh\'s recording: "Two places on the map. Only one is real. Go where the light doesn\'t blink."',
             next: 'map'
           })
         }
       ]
     },
 
-    // 4. The map: the right pick depends on what you learned earlier
+    // 4. The map
     map: {
       tag: 'THE MAP ON THE WALL',
       text: (s) => {
         const lines = [
-          'A map of the coast is pinned above the desk, with two places circled in red marker. North Cove, the ruins of an old whaling station, is circled once with a question mark beside it. A spot out in the bay marked "vessel" is circled twice, so hard the pen tore the paper.'
+          'A coastline map is pinned over the desk. Two places are marked in red. North Cove has a small lighthouse symbol beside it, circled neatly. A spot out in the bay, labeled "vessel", has an X through it and a question mark.'
         ];
-        if (s.flags.radioClue) lines.push('"Where the light doesn\'t turn off." Josh\'s words echo in your head.');
-        if (s.flags.trustPilot) lines.push('You remember the pilot talking about a ship in the bay, lit up all night.');
-        if (!s.flags.radioClue && !s.flags.trustPilot) lines.push('You have nothing but the map to go on.');
+        if (s.flags.radioClue) lines.push('"Go where the light doesn\'t blink."');
+        if (s.flags.trustPilot) lines.push('"A vessel out in the bay that hasn\'t gone dark since."');
+        if (!s.flags.radioClue && !s.flags.trustPilot) lines.push('That is all the map gives you.');
         return lines;
       },
       choices: [
         {
-          label: 'Head for the vessel out in the bay.',
+          label: 'The vessel in the bay.',
           resolve: (s) => {
-            const certain = s.flags.radioClue && s.flags.trustPilot;
+            const sure = s.flags.radioClue && s.flags.trustPilot;
             return {
-              distance: certain ? -2 : -1,
-              text: certain
-                ? [
-                    'Everything lines up: the pilot\'s warning, Josh\'s message, the twice-torn circle. You are certain.',
-                    'You pull on your gloves and head for the shore with purpose.'
-                  ]
-                : [
-                    'It is a guess, but the pen tearing through the paper feels like Josh shouting.',
-                    'You head down toward the shore.'
-                  ],
-              info: 'Josh circled the vessel in the bay twice.',
-              next: 'shore'
+              distance: sure ? -2 : -1,
+              text: sure
+                ? ['Two different people, two different warnings, one light. You stop doubting.']
+                : ['You are not sure. You go anyway.'],
+              info: 'The map marks a vessel in the bay with an X and a question mark.',
+              next: 'coast'
             };
           }
         },
         {
-          label: 'Head for North Cove and the old whaling station.',
+          label: 'North Cove.',
           resolve: () => ({
             distance: 1,
             text: [
-              'The ruins are hours away along the coast. When you arrive, the station is a shell of rusted iron and drifted snow.'
+              'North Cove is hours down the coast. A beacon on its tower blinks, patient and steady, every few seconds.'
             ],
             next: 'detourCove'
           })
@@ -360,30 +361,63 @@
     detourCove: {
       tag: 'NORTH COVE',
       text: () => [
-        'Frost has eaten the walls. The only sign anyone has been here is a pair of boot prints leading to the water\'s edge, where they stop, as if whoever made them stepped onto a boat.',
-        'Far out in the bay, lights burn that never flicker off. At the back of the station is a locked storeroom.'
+        'The old whaling station is a rusted shell. At its edge a beacon tower blinks on and off, on and off. Past the breakwater, far out in the bay, there is another light. It does not blink at all.'
       ],
       choices: [
         {
-          label: 'Walk to the water\'s edge and watch the lights across the bay.',
+          label: 'Climb the beacon tower for a better look.',
           resolve: () => ({
             distance: -1,
             text: [
-              'A ship sits at anchor with a red stripe along its hull and every deck lit. Josh\'s words come back to you: where the light doesn\'t turn off.',
-              'You were wrong about North Cove, but there is still time.'
+              'From the top you can see everything: the coast, the bay, and a vessel with every deck lit, steady as a held breath.'
             ],
-            info: 'The ship in the bay has a red stripe and every light on.',
-            next: 'shore'
+            info: 'From the beacon tower: a vessel in the bay with unblinking lights.',
+            next: 'coast'
           })
         },
         {
-          label: 'Break into the locked storeroom at the back of the station.',
+          label: 'Search the station buildings.',
           resolve: () => ({
             distance: 2,
             flags: { lostTime: true },
             text: [
-              'It takes hours with a rusted bar. When the door finally gives, there is nothing inside but empty crates and frozen rope.',
-              'By the time you step outside, you spot the lights across the bay and curse yourself for not looking sooner.'
+              'Frozen rooms, collapsed beams, a fish-processing floor. You find nothing, and the hours go like they were never yours.',
+              'When you step outside, the far-off light is the only thing you can think about.'
+            ],
+            next: 'coast'
+          })
+        }
+      ]
+    },
+
+    // 5. The coast
+    coast: {
+      tag: 'THE COAST',
+      text: (s) => [
+        'Between you and the shore is a long stretch of headland. A packed trail winds along it. Across the frozen inlet, a straight line leads almost to the water, shorter by half.',
+        s.flags.followedFlags
+          ? 'At the edge of the trail, half buried, there is another orange marker. You scan the ice. There are none out there.'
+          : 'Nothing here tells you which way is safe.'
+      ],
+      choices: [
+        {
+          label: 'Take the trail along the headland.',
+          resolve: () => ({
+            distance: -1,
+            text: [
+              'It is a long walk and your legs know it. The shore comes up slowly, and then all at once.'
+            ],
+            next: 'shore'
+          })
+        },
+        {
+          label: 'Cross the frozen inlet.',
+          resolve: () => ({
+            distance: 2,
+            flags: { lostTime: true },
+            text: [
+              'The ice talks under you, a low groan that you feel in your teeth. You make it across, but not before a section gives way and you drag yourself out soaked.',
+              'You lose hours to a fire you should never have needed.'
             ],
             next: 'shore'
           })
@@ -391,45 +425,36 @@
       ]
     },
 
-    // 5. The shoreline: your earlier radio call comes back to haunt you
+    // 6. The shoreline
     shore: {
       tag: 'THE SHORELINE',
       text: (s) => [
-        'At the water\'s edge, a small inflatable boat is tied to a rotting dock. A ship with a red stripe sits at anchor a few hundred meters out.',
-        s.flags.broadcast
-          ? 'A spotlight on the ship\'s deck sweeps the water in slow arcs. Whoever heard your radio call is watching for you.'
-          : 'The ship is lit up from bow to stern, but nobody seems to be on deck.',
-        'You can paddle across in the dark with the oars, silent but slow, or start the outboard and be there in minutes.'
+        'A small inflatable is tied to a rotting dock. A ship sits a few hundred meters out, every deck lit. The oars are cracked. The outboard has fuel.',
+        s.flags.broadcast ? 'A spotlight sweeps the water in slow arcs, as if it knows someone is out here.' : null
       ],
       choices: [
         {
-          label: 'Paddle across with the oars.',
+          label: 'Take the oars.',
           resolve: (s) => ({
             distance: s.flags.broadcast ? 0 : -1,
-            flags: { quiet: true },
             text: s.flags.broadcast
-              ? [
-                  'You duck behind an ice floe every time the spotlight sweeps near. It is slow and your arms burn, but the light never finds you.'
-                ]
-              : [
-                  'The water is black and silent. Nobody on the ship notices a thing.'
-                ],
+              ? ['You duck behind every ice floe the spotlight slides toward. It takes forever, and your arms are on fire, but the light never finds you.']
+              : ['The water is black and nothing on the ship stirs. The only sound is the creak of the oars.'],
             next: 'ship'
           })
         },
         {
-          label: 'Start the outboard and race across.',
+          label: 'Take the outboard.',
           resolve: (s) => ({
             distance: s.flags.broadcast ? 3 : 2,
             flags: { alerted: true },
             text: s.flags.broadcast
               ? [
-                  'A shout carries over the water. The spotlight locks onto you and the ship\'s engines rumble to life.',
-                  'By the time you scramble up its side, the entire crew is awake and waiting.'
+                  'A shout carries over the water. The spotlight locks onto you and the ship\'s engines grumble to life.',
+                  'By the time you reach the hull, someone is already waiting.'
                 ]
               : [
-                  'The engine echoes across the bay. Nobody shouts, but lights come on one by one along the deck.',
-                  'Whoever is aboard knows someone is coming.'
+                  'The motor echoes across the bay like a drumroll. Nobody shouts, but lights come on one by one along the deck.'
                 ],
             next: 'ship'
           })
@@ -437,15 +462,15 @@
       ]
     },
 
-    // 6. Boarding the ship: look for Josh's marker
+    // 7. The ship
     ship: {
       tag: 'THE SHIP',
       text: () => [
-        'Up close, the ship is enormous and streaked with rust. There are two ways aboard. A rope ladder hangs off the stern, in plain view of a camera dome. Lower down, near the waterline, is a cargo hatch, and a strip of cloth tied with a double knot hangs from its latch.'
+        'Up close, the ship is a cliff of rust. A rope ladder hangs from the stern, in the eye of a camera dome. Lower down, near the waterline, a cargo hatch sits slightly ajar. Something pale is caught on the latch. It could be anything.'
       ],
       choices: [
         {
-          label: 'Climb the rope ladder at the stern.',
+          label: 'The rope ladder.',
           resolve: () => ({
             distance: 1,
             flags: { seenOnDeck: true },
@@ -457,122 +482,111 @@
           })
         },
         {
-          label: 'Slip through the cargo hatch with the knotted cloth.',
+          label: 'The cargo hatch.',
           resolve: () => ({
             distance: -1,
-            flags: { hatch: true },
             text: [
-              'The latch gives easily, as if someone unlocked it for you.',
-              'Inside, the air smells of oil and cold metal. You pull the hatch shut behind you. Nobody saw you come aboard.'
+              'The pale thing is a strip of cloth, tied in a clumsy double knot. The latch has been left unlocked.',
+              'Inside, the air smells of oil and cold metal. You pull the hatch shut behind you.'
             ],
-            info: 'Josh unlocked the cargo hatch and left a knotted cloth as a marker.',
+            info: 'A knotted strip of cloth marked the unlocked cargo hatch.',
             next: 'hold'
           })
         }
       ]
     },
 
-    // 7. Below deck: listen for Josh
+    // 8. Below deck
     hold: {
       tag: 'BELOW DECK',
       text: (s) => [
-        'The hold is a maze of crates and dim emergency lights. Two corridors split off ahead. From the left comes the murmur of voices and the smell of cigarette smoke. From the right comes a faint, irregular tapping against metal. Tap, tap-tap, tap.',
-        'You know that rhythm. It is the beat Josh drums on every table he sits at.',
-        s.flags.seenOnDeck ? 'Somewhere above you, boots are moving fast.' : null
+        'The hold is a maze of crates and dim emergency lights. To your left, two voices murmur over the clink of a mug. "Check on him again." "He\'s not going anywhere." To your right, from far off, there is a faint tapping against metal. Tap, tap-tap, tap.',
+        s.flags.seenOnDeck ? 'Boots overhead, moving fast.' : null
       ],
       choices: [
+        {
+          label: 'Follow the voices.',
+          resolve: () => ({
+            distance: 2,
+            flags: { spotted: true },
+            text: [
+              'You get close enough to see a doorway, a lamp, the back of a man\'s head. Then someone sees you.',
+              'You run, and keep running, and when you finally stop you have no idea where you are.'
+            ],
+            next: 'corridor'
+          })
+        },
         {
           label: 'Follow the tapping.',
           resolve: () => ({
             distance: -1,
             flags: { followedTapping: true },
             text: [
-              'The tapping guides you through the dark. Whoever is making it does not give up. Every few seconds it starts again, patient and deliberate.'
+              'The tapping stops when you get close and starts again when you turn away. Whoever is making it is listening for you.'
             ],
-            info: 'Someone is tapping Josh\'s drumming rhythm on the metal below deck.',
-            next: 'corridor'
-          })
-        },
-        {
-          label: 'Follow the voices. Someone there must know something.',
-          resolve: () => ({
-            distance: 2,
-            flags: { spotted: true },
-            text: [
-              'You creep close enough to hear two men arguing about a schedule and "the package". Then one of them turns and sees you in the gap between the crates.',
-              'You run. You lose them eventually, but you lose a lot of ground doing it.'
-            ],
+            info: 'Tapping from below deck in a pattern: tap, tap-tap, tap.',
             next: 'corridor'
           })
         }
       ]
     },
 
-    // 8. The corridor: hiding spots
+    // 9. The corridor
     corridor: {
       tag: 'THE CORRIDOR',
       text: (s) => [
-        'Footsteps are coming down the corridor. A crewman is walking slowly, checking every door. You have a few seconds. Next to you is a supply locker with its door hanging open. A little farther on is a narrow gap behind a cluster of pipes.',
-        s.flags.broadcast ? 'He does not walk like a man on routine patrol. He walks like a man who was told to expect someone.' : null
+        'Footsteps. A crewman, walking slowly, checking each door in turn. Beside you is a supply locker with a latch on the inside, deep enough to stand in. A little farther along is a gap behind a bundle of scalding pipes, barely wide enough for a person.',
+        s.flags.broadcast ? 'He doesn\'t walk like it\'s routine. He walks like someone who was told to expect company.' : null
       ],
       choices: [
         {
-          label: 'Hide in the supply locker.',
+          label: 'The locker.',
           resolve: () => ({
             distance: 2,
             text: [
-              'It is the first place he looks. The door swings open and you shove past him and run.',
-              'You get away, but now he is shouting for backup, and Josh is getting further away.'
+              'The latch is on the inside, but that doesn\'t matter when he opens the door himself. You shove past him and run, and you hear him shout.'
             ],
             next: 'door'
           })
         },
         {
-          label: 'Squeeze into the gap behind the pipes.',
+          label: 'Behind the pipes.',
           resolve: (s) => ({
             distance: s.flags.broadcast ? 0 : -1,
             text: s.flags.broadcast
-              ? [
-                  'You hold your breath until your lungs ache. He stops inches away, runs his light up and down the wall, and finally, finally moves on.'
-                ]
-              : [
-                  'You press yourself against the cold metal. He walks right past, humming, and never looks your way.'
-                ],
+              ? ['The metal burns through your sleeves. He stops inches away, runs his light up and down the wall, and finally moves on.']
+              : ['The metal burns through your sleeves. He walks right past, humming, and never looks your way.'],
             next: 'door'
           })
         }
       ]
     },
 
-    // 9. The locked door: lost time makes this harder
+    // 10. The door
     door: {
       tag: 'THE LOCKED DOOR',
       text: (s) => [
-        'At the end of the corridor is a steel door with a blacked-out window. The tapping is coming from somewhere nearby. The door is locked. You have a hairpin in your pocket, and a fire axe hangs on the wall behind you.',
-        s.flags.lostTime ? 'You cannot stop thinking about the hours you wasted. Every second counts now.' : null
+        'A steel door with a blacked-out window. The frame is old and rotted around the lock. You have a hairpin in your pocket, and a fire axe hangs on the wall behind you.',
+        s.flags.lostTime ? 'All those lost hours press on you.' : null
       ],
       choices: [
         {
-          label: 'Pick the lock with the hairpin.',
+          label: 'Work the lock.',
           resolve: (s) => ({
             distance: s.flags.lostTime ? 0 : -1,
             text: s.flags.lostTime
-              ? [
-                  'Your hands shake from the cold and it takes far too long, but the lock finally clicks. You get the door open with only seconds to spare.'
-                ]
-              : [
-                  'The lock gives with a soft click. Slowly and carefully, you ease the door open.'
-                ],
+              ? ['Your hands shake from the cold and it takes far too long, but the lock finally clicks. You get the door open with seconds to spare.']
+              : ['The lock gives with a soft click. Slowly, carefully, you ease the door open.'],
             next: 'note'
           })
         },
         {
-          label: 'Smash the door open with the axe.',
+          label: 'Use the axe.',
           resolve: () => ({
             distance: 2,
             flags: { alerted: true },
             text: [
-              'The sound is like a gunshot. The door gives, but the whole ship hears it, and lights start coming on.'
+              'The sound is like a gunshot. The door gives, but so does the silence, and lights start coming on up and down the ship.'
             ],
             next: 'note'
           })
@@ -580,38 +594,37 @@
       ]
     },
 
-    // 10. Final question of part 3: the tapping is the clue
+    // 11. Final question of part 3
     note: {
       tag: 'THE EMPTY ROOM',
       text: (s) => [
-        'The room is empty. A chair, a bucket, and a blanket that is still warm. Josh has been moved, and recently.',
-        'Scratched into the paint with something small and sharp are two arrows and two words in his handwriting. Up: "helipad". Down: "engine room". Below them: "He needs me alive. For now."',
-        'Through the ceiling you hear a heavy thump-thump-thump, rotors spinning up. And then, faint and far below your feet, the tapping starts again.',
+        'The room is empty. A chair, a bucket, a blanket that is still warm. Josh has been moved, and not long ago.',
+        'Scratched into the paint at knee height, two arrows and two words. Up: "helipad". Down: "engine room". Beneath them, smaller: "He needs me alive. For now."',
+        'Overhead, rotors begin to turn.',
+        s.flags.followedTapping ? 'And from somewhere far below your feet, faint, a rhythm: tap, tap-tap, tap.' : null,
         s.flags.alerted ? 'Boots thunder in the corridor behind you. You have seconds.' : null
       ],
       choices: [
         {
-          label: 'Race up to the helipad before the helicopter takes off.',
+          label: 'Go up to the helipad.',
           resolve: () => ({
             distance: 2,
             flags: { chasedHelicopter: true },
             text: [
-              'You burst onto the deck into the freezing wind as the helicopter lifts off into the dark. Josh is not on it. You can see that now, when it is too late.',
-              'Behind you, the ship\'s crew spills onto the deck.'
+              'You burst onto the deck as the helicopter lifts into the dark. Josh is not on it. You can see that now, when it is too late.',
+              'Behind you, the crew spills out onto the deck.'
             ],
             next: 'END'
           })
         },
         {
-          label: 'Follow the tapping down toward the engine room.',
+          label: 'Go down to the engine room.',
           resolve: () => ({
             distance: -1,
             flags: { foundEngineRoomPath: true },
             text: [
-              'The tapping gets louder as you descend. For the first time, you can almost hear what Josh is trying to tell you.',
-              'The helicopter was a decoy. This is where he is.'
+              'Down. The air gets warmer, then hotter, and something heavy hums up through the floor. Whatever is down here, it is close.'
             ],
-            info: 'The helicopter was a decoy. Josh is being kept below, near the engine room.',
             next: 'END'
           })
         }
@@ -625,8 +638,9 @@
     renderTrail();
     clearScreen();
     addText('PART 3: THE TRAIL SOUTH', 'location-tag');
-    addText('Josh\'s video is still open on your screen. Your name is the title, and a set of coordinates is the message. He knew the man who followed him home was not going to stop, so he made sure you would know where to start.');
-    addText('From here on, every choice either brings you closer to Josh or carries you further away from him. Go too far in the wrong direction and the trail goes cold for good.');
+    addText('Josh\'s video is still open on your screen. Your name for a title, a set of coordinates for a message, and nothing else. He knew the man who followed him home was not going to stop.');
+    addText('Josh never could sit still. Tabletops, steering wheels, your shoulder. Always drumming, always the same patterns.');
+    addText('Choose carefully. Not every wrong turn announces itself.');
     addInfo('Josh\'s GoTube video, titled "Philip", gave the coordinates 72°00\'36.0"S 168°34\'40.0"E.');
     addButton('Head south', () => showScene('pilot'));
   }
