@@ -1,0 +1,205 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+/* ---------- Stage ---------- */
+#stage {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #05070d 0%, #0d1522 55%, #17222f 100%);
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+#stage.visible { opacity: 1; }
+#stage.faded { opacity: 0; transition: opacity 2.2s ease; }
+#stage.shake { animation: shake 0.35s linear; }
+
+@keyframes shake {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-8px, 4px); }
+  40%  { transform: translate(7px, -5px); }
+  60%  { transform: translate(-6px, 3px); }
+  80%  { transform: translate(4px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+
+#fog {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 30% at 20% 75%, rgba(120, 150, 180, 0.12), transparent),
+    radial-gradient(50% 25% at 80% 70%, rgba(120, 150, 180, 0.10), transparent);
+  animation: drift 12s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: translateX(-3%); }
+  to   { transform: translateX(3%); }
+}
+
+#ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18%;
+  background: linear-gradient(180deg, #1b2735 0%, #0a0f17 100%);
+  border-top: 2px solid #26364a;
+}
+
+/* ---------- Figures ---------- */
+.figure {
+  position: absolute;
+  bottom: 18%;
+  height: clamp(130px, 30vh, 240px);
+  aspect-ratio: 60 / 130;
+  transform-origin: 50% 100%;
+}
+
+.figure svg {
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+  display: block;
+}
+
+#player {
+  left: 6%;
+  transition: left 4.2s linear, transform 1.1s cubic-bezier(0.55, 0, 0.9, 0.55);
+}
+
+/* Once the player stops, only the fall animates (no more sliding left/right) */
+#player.stop { transition: transform 1.1s cubic-bezier(0.55, 0, 0.9, 0.55); }
+
+#shadow {
+  left: 90%;
+  opacity: 0;
+  transition: opacity 1.6s ease, left 0.7s cubic-bezier(0.5, 0, 1, 0.7);
+}
+
+#shadow svg { transform: scaleX(-1); }
+
+#shadow.show { opacity: 1; }
+#shadow.rush { left: 44%; opacity: 1; }
+#shadow.gone { display: none; }
+
+.knife { opacity: 0; transition: opacity 0.2s; }
+#shadow.rush .knife { opacity: 1; }
+
+/* Walking and running leg swing */
+.leg {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+
+.walking .leg-a { animation: swing 0.6s ease-in-out infinite alternate; }
+.walking .leg-b { animation: swing 0.6s ease-in-out infinite alternate-reverse; }
+
+.running .leg-a { animation: swing 0.2s ease-in-out infinite alternate; }
+.running .leg-b { animation: swing 0.2s ease-in-out infinite alternate-reverse; }
+
+@keyframes swing {
+  from { transform: rotate(-24deg); }
+  to   { transform: rotate(24deg); }
+}
+
+/* Player reacting */
+#player.hit { transform: rotate(-7deg) translateX(-6px); }
+#player.down { transform: rotate(88deg); }
+
+/* ---------- Impact effects ---------- */
+#slash {
+  position: absolute;
+  top: 42%;
+  left: 30%;
+  width: 40%;
+  height: 4px;
+  background: #fff;
+  transform: rotate(-24deg) scaleX(0);
+  transform-origin: left center;
+  opacity: 0;
+}
+
+#slash.go { animation: slash 0.22s ease-out forwards; }
+
+@keyframes slash {
+  0%   { opacity: 1; transform: rotate(-24deg) scaleX(0); }
+  100% { opacity: 0; transform: rotate(-24deg) scaleX(1); }
+}
+
+#flash {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+#flash.red { background: #8a0000; }
+#flash.go { animation: flash 0.28s ease-out; }
+
+@keyframes flash {
+  0%   { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+#cover {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+#cover.on { opacity: 1; }
+
+/* ---------- Ending text ---------- */
+#ending {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+#ending-text {
+  margin: 0;
+  max-width: 28em;
+  color: #c40000;
+  font-size: clamp(1.4rem, 4.5vw, 2.6rem);
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+
+#ending-text.show { opacity: 1; }
+
+#retry {
+  opacity: 0;
+  padding: 0.7em 1.6em;
+  font-size: 1rem;
+  color: #d9d9d9;
+  background: transparent;
+  border: 1px solid #5a5a5a;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 2s ease, background 0.2s, color 0.2s;
+}
+
+#retry.show { opacity: 1; pointer-events: auto; }
+#retry:hover { background: #1a1a1a; color: #fff; }
