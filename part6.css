@@ -1,0 +1,142 @@
+/* Part 6. Loaded after style.css, so these only layer on top of it. */
+
+body.part6 {
+  background: linear-gradient(180deg, #05080c 0%, #0e1a22 70%, #14242d 100%);
+  color: #e3ecf1;
+}
+
+#game-screen .location-tag {
+  font-size: 0.85em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+#game-screen button {
+  display: block;
+  margin: 0.6em 0;
+}
+
+#info-content .info-entry {
+  margin: 0.5em 0;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.p6-feedback {
+  min-height: 1.4em;
+  color: #ffb4a8;
+  font-style: italic;
+}
+
+.p6-input-row {
+  display: flex;
+  gap: 0.6em;
+  align-items: center;
+  margin: 0.8em 0;
+  flex-wrap: wrap;
+}
+
+.p6-input-row input[type="text"] {
+  flex: 1 1 10em;
+  min-width: 8em;
+  padding: 0.6em 0.8em;
+  font-size: 1.1em;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: #0b1218;
+  color: #e6eef3;
+  border: 1px solid #3b5366;
+  border-radius: 4px;
+}
+
+.p6-input-row button { margin: 0; }
+
+/* ---------- Paper: the notebook ---------- */
+.p6-notebook {
+  margin: 1em 0;
+  padding: 1em 1.2em;
+  background: #e6dfc8;
+  color: #2b2b2b;
+  font-family: 'Courier New', monospace;
+  line-height: 1.8;
+  border-radius: 3px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  transform: rotate(-0.5deg);
+}
+
+.p6-notebook .p6-nb-head {
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid #8a8570;
+  margin-bottom: 0.4em;
+}
+
+.p6-keystrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.6em, 1fr));
+  gap: 0.3em;
+  margin: 0.8em 0;
+  font-family: monospace;
+  font-size: 0.85em;
+}
+
+.p6-keystrip span {
+  text-align: center;
+  padding: 0.25em 0.1em;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 3px;
+}
+
+/* ---------- The timeline cards ---------- */
+.p6-order {
+  margin: 0.8em 0;
+  padding-left: 1.4em;
+  min-height: 1.5em;
+}
+
+.p6-order li { margin: 0.2em 0; }
+
+/* ---------- The radio tuner ---------- */
+.p6-static {
+  min-height: 7em;
+  margin: 0.8em 0;
+  padding: 0.8em 1em;
+  background: #05090c;
+  border: 1px solid #284050;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  color: #9ee7b0;
+  white-space: pre-wrap;
+}
+
+.p6-tuner {
+  width: 100%;
+  margin: 0.6em 0;
+}
+
+.p6-signal {
+  height: 8px;
+  margin: 0.4em 0 0.8em;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.p6-signal-fill {
+  height: 100%;
+  width: 0;
+  background: #9ee7b0;
+  transition: width 0.1s linear;
+}
+
+/* ---------- Phone messages ---------- */
+.p6-bubble {
+  margin: 0.6em 0;
+  padding: 0.7em 1em;
+  background: rgba(255, 255, 255, 0.07);
+  border-left: 3px solid #5a7a90;
+  border-radius: 4px;
+}
