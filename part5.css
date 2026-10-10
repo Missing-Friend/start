@@ -28,35 +28,6 @@ body.part5 {
   opacity: 0.8;
 }
 
-.p5-feedback {
-  min-height: 1.4em;
-  color: #ffb4a8;
-  font-style: italic;
-}
-
-.p5-input-row {
-  display: flex;
-  gap: 0.6em;
-  align-items: center;
-  margin: 0.8em 0;
-  flex-wrap: wrap;
-}
-
-.p5-input-row input[type="text"] {
-  flex: 1 1 10em;
-  min-width: 8em;
-  padding: 0.6em 0.8em;
-  font-size: 1.1em;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  background: #0b1218;
-  color: #e6eef3;
-  border: 1px solid #3b5366;
-  border-radius: 4px;
-}
-
-.p5-input-row button { margin: 0; }
-
 /* ---------- Waking up: eyelids ---------- */
 .p5-lid {
   position: fixed;
@@ -147,19 +118,20 @@ body.part5 {
   z-index: 2;
 }
 
-/* The scratched tap-code grid */
-.p5-hs-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-auto-rows: 1fr;
-  place-items: center;
+/* Words scratched into the wall */
+.p5-hs-scratch {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: 4%;
   font-family: 'Courier New', monospace;
   font-weight: bold;
-  font-size: clamp(0.7rem, 1.8vw, 1.2rem);
+  font-size: clamp(0.65rem, 1.7vw, 1.15rem);
+  line-height: 1.5;
   color: #8d99a4;
   text-shadow: 0 0 2px #000;
   background: rgba(255, 255, 255, 0.03);
+  transform: rotate(-2deg);
 }
 
 /* A bed frame with a snapped corner */
@@ -209,50 +181,6 @@ body.part5 {
 }
 
 .p5-note p { margin: 0.3em 0; }
-
-/* ---------- Tap code ---------- */
-.p5-letters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8em;
-  margin: 1em 0;
-}
-
-.p5-letter {
-  min-width: 7.5em;
-  padding: 0.5em 0.7em;
-  text-align: center;
-  border: 1px solid #3b5366;
-  border-radius: 4px;
-  transition: background 0.08s;
-}
-
-.p5-letter.flash { background: rgba(111, 211, 255, 0.28); }
-
-.p5-r, .p5-c {
-  display: inline-block;
-  min-width: 3.4em;
-  min-height: 1.4em;
-  font-size: 1.15em;
-  letter-spacing: 0.2em;
-  color: #cfe3f0;
-}
-
-.p5-sep { opacity: 0.5; }
-
-.p5-letter.mine { border-color: #6fd3ff; }
-
-.p5-gridref {
-  display: inline-block;
-  margin: 0.4em 0 1em;
-  padding: 0.6em 1.1em;
-  font-family: 'Courier New', monospace;
-  letter-spacing: 0.55em;
-  line-height: 1.5;
-  white-space: pre;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
-}
 
 /* ---------- Listening for the horn ---------- */
 .p5-listen {
