@@ -534,6 +534,8 @@
     doneBtn.onclick = () => {
       finished = true;
       clearInterval(tick);
+      // Did you leave the dark with some battery to spare? A secret ending needs this.
+      setFlags({ phoneAlive: state.battery > 0 });
       go(sceneWall);
     };
 
