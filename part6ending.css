@@ -1,0 +1,674 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+body { --fig-h: clamp(130px, 30vh, 240px); }
+
+/* Every scene is a "view" that fades in over the last one */
+.v {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s linear;
+  overflow: hidden;
+  background: #05070a;
+}
+
+.v.show { opacity: 1; }
+
+.fig {
+  position: absolute;
+  height: var(--fig-h);
+  aspect-ratio: 60 / 130;
+  transform-origin: 50% 100%;
+}
+
+.fig svg {
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+  display: block;
+}
+
+.leg {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+
+.running .la { animation: swing 0.24s ease-in-out infinite alternate; }
+.running .lb { animation: swing 0.24s ease-in-out infinite alternate-reverse; }
+
+@keyframes swing {
+  from { transform: rotate(-28deg); }
+  to   { transform: rotate(28deg); }
+}
+
+@keyframes blink {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+
+/* =====================================================
+   1. THE HOLD
+   ===================================================== */
+#v-hold { background: linear-gradient(180deg, #05070a 0%, #0c1218 60%, #151e26 100%); }
+
+#h-beam {
+  position: absolute; left: 0; right: 0; top: 0; height: 4vh;
+  background: linear-gradient(180deg, #1c252e, #10171d);
+  border-bottom: 2px solid #26323d;
+}
+
+#h-ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 16vh;
+  background: linear-gradient(180deg, #18222c 0%, #07090c 100%);
+  border-top: 2px solid #25323e;
+}
+
+#h-lever {
+  position: absolute; left: 5vw; bottom: 28vh; width: 5vh; height: 5vh;
+  background: #28323c; border: 3px solid #1a232b; border-radius: 6px;
+}
+
+#h-lever-bar {
+  position: absolute; left: 50%; bottom: 50%; width: 1.3vh; height: 11vh; margin-left: -0.65vh;
+  background: linear-gradient(90deg, #7a4a2d, #b0703f 50%, #6a3f26); border-radius: 40% 40% 20% 20%;
+  transform-origin: 50% 100%; transform: rotate(-32deg);
+}
+
+#h-table {
+  position: absolute; left: 52vw; bottom: 16vh; width: 22vw; height: calc(var(--fig-h) * 0.4);
+  background: linear-gradient(180deg, #3a4651 0 12%, #1e2830 12% 100%);
+  border-top: 3px solid #526170;
+}
+
+#h-crate {
+  position: absolute; left: 47vw; top: 11vh; width: 30vw; height: 36vh;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.28) 0 3px, transparent 3px 46px),
+    linear-gradient(180deg, #7b5a37 0%, #5d4128 100%);
+  border: 4px solid #3a2815;
+  z-index: 6;
+}
+
+#h-josh, #h-pilot, #h-player { bottom: 16vh; }
+#h-josh { left: 55vw; }
+#h-pilot { left: 64vw; }
+#h-josh svg, #h-pilot svg { transform: scaleX(-1); }
+#h-player { left: 30vw; z-index: 4; transition: left 1.2s cubic-bezier(0.5, 0, 0.9, 0.8); }
+
+/* =====================================================
+   2. THE SPRINT
+   ===================================================== */
+#v-corridor { background: linear-gradient(180deg, #080c11, #111a23); }
+
+#c-world {
+  position: absolute;
+  inset: 0;
+  transform-origin: 86vw 58vh;
+  transition: transform 2.3s cubic-bezier(0.4, 0, 0.9, 0.6);
+}
+
+#c-world.zoom { transform: scale(3.4); }
+
+#c-lamps {
+  position: absolute; left: 0; right: 0; top: 0; height: 16vh;
+  background: radial-gradient(circle at 50% 100%, rgba(255, 235, 180, 0.55) 0 1.6vh, transparent 2.4vh) 0 0 / 22vw 100% repeat-x;
+}
+
+#c-ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 30vh;
+  background: linear-gradient(180deg, #18232d, #070a0e);
+  border-top: 2px solid #26343f;
+}
+
+#c-door {
+  position: absolute; left: 80vw; bottom: 30vh;
+  width: calc(var(--fig-h) * 0.8); height: calc(var(--fig-h) * 1.45);
+  background: linear-gradient(90deg, #3b4650, #55626d 50%, #3b4650);
+  border: 4px solid #1b242c;
+}
+
+#c-sign {
+  position: absolute; left: 80vw; bottom: calc(30vh + var(--fig-h) * 1.45 + 10px);
+  width: calc(var(--fig-h) * 0.8); text-align: center;
+  font: bold 0.9rem monospace; letter-spacing: 0.2em; color: #cfe3f0;
+}
+
+#c-player { bottom: 30vh; left: -12vw; transition: left 1.25s linear; }
+#c-player.in { opacity: 0; transition: opacity 0.12s linear; }
+
+/* =====================================================
+   3. THE BATHROOM
+   ===================================================== */
+#v-bath { background: #0c141b; }
+
+#b-tiles {
+  position: absolute; inset: 0 0 22vh 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.07) 0 2px, transparent 2px 10vh),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 2px, transparent 2px 10vh),
+    linear-gradient(180deg, #1b2a35, #13202a);
+}
+
+#b-floor {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 22vh;
+  background: linear-gradient(180deg, #0f1a22, #05090c);
+  border-top: 2px solid #2a3b48;
+}
+
+#b-mirror {
+  position: absolute; left: 10vw; top: 14vh; width: 22vw; height: 32vh;
+  background: linear-gradient(135deg, #2e4352, #162531); border: 5px solid #50626f;
+}
+
+#b-sink {
+  position: absolute; left: 11vw; bottom: 22vh; width: 20vw; height: 11vh;
+  background: linear-gradient(180deg, #9aa9b3, #6d7c86);
+  border-radius: 8px 8px 40% 40% / 8px 8px 60% 60%;
+}
+
+#b-stall {
+  position: absolute; left: 74vw; bottom: 22vh; width: 18vw; height: 48vh;
+  background: linear-gradient(90deg, #26343f, #31424f 50%, #26343f);
+  border: 3px solid #17222b;
+}
+
+#b-batt {
+  position: absolute; right: 3vw; top: 3vh; z-index: 5;
+  color: #ff6b6b; font: bold 0.95rem monospace; letter-spacing: 0.1em;
+  opacity: 0; animation: blink 1.2s steps(2, end) infinite;
+}
+
+#v-bath.call #b-batt { opacity: 1; }
+
+#b-mover {
+  position: absolute; bottom: 22vh; left: 24vw;
+  height: var(--fig-h); aspect-ratio: 60 / 130;
+}
+
+#b-player { position: absolute; inset: 0; height: 100%; }
+
+#v-bath.pacing #b-mover { animation: pace 3.4s linear infinite; }
+#v-bath.pacing #b-player svg { animation: paceface 3.4s steps(1, end) infinite; }
+#v-bath.still #b-mover { left: 44vw; }
+
+@keyframes pace {
+  0%   { left: 24vw; }
+  46%  { left: 58vw; }
+  50%  { left: 58vw; }
+  96%  { left: 24vw; }
+  100% { left: 24vw; }
+}
+
+@keyframes paceface {
+  0%   { transform: scaleX(1); }
+  50%  { transform: scaleX(-1); }
+  100% { transform: scaleX(1); }
+}
+
+/* The phone in his hand, glowing */
+#b-phone {
+  position: absolute; left: 74%; top: 36%; width: 12%; height: 19%;
+  background: #d4ecff; border-radius: 3px;
+  box-shadow: 0 0 16px 4px rgba(190, 230, 255, 0.7);
+  transform: rotate(-10deg);
+  opacity: 0;
+  transition: left 0.3s ease, top 0.3s ease;
+}
+
+#v-bath.phone #b-phone { opacity: 1; }
+#v-bath.call #b-phone { left: 56%; top: 9%; transform: rotate(-18deg); }
+
+/* =====================================================
+   4. DIALING 911
+   ===================================================== */
+#v-dial {
+  background: radial-gradient(ellipse at 50% 40%, #121c26 0%, #05080b 80%);
+  display: flex; align-items: center; justify-content: center;
+}
+
+#phone {
+  position: relative;
+  width: min(38vh, 72vw); height: 84vh;
+  background: #0a0e13; border: 3px solid #2a3947; border-radius: 28px;
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 0 60px rgba(120, 190, 255, 0.15);
+}
+
+#ph-top {
+  display: flex; justify-content: space-between;
+  font: bold 0.8rem monospace; letter-spacing: 0.1em; color: #9fc3dc;
+}
+
+#ph-batt { color: #ff6b6b; animation: blink 1s steps(2, end) infinite; }
+
+#ph-number {
+  min-height: 2.4em; padding-top: 0.6em; text-align: center;
+  font: 2rem monospace; letter-spacing: 0.2em; color: #eaf6ff;
+}
+
+#ph-keys {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1;
+  align-content: center;
+}
+
+.k {
+  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 1; font-size: 1.6rem; color: #dcebf6;
+  background: #16212c; border-radius: 50%; transition: background 0.1s;
+}
+
+.k.hit { background: #3d6c90; }
+
+#ph-call {
+  text-align: center; padding: 0.8em; border-radius: 999px;
+  background: #1f7a46; color: #eafff2; font-weight: bold; letter-spacing: 0.2em;
+}
+
+#ph-call.hit { background: #35c070; }
+#ph-call.ringing { animation: blink 0.5s steps(2, end) infinite; }
+
+/* A black-gloved fingertip */
+#finger {
+  position: absolute; left: 0; top: 0; width: 8vh; height: 34vh;
+  background: linear-gradient(90deg, #0a0a0d, #25252c 50%, #0a0a0d);
+  border-radius: 4vh 4vh 1.4vh 1.4vh;
+  transform: translate(50vw, 110vh);
+  transform-origin: 50% 0;
+  transition: transform 0.32s cubic-bezier(0.3, 0, 0.2, 1), filter 0.1s;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.8);
+  z-index: 3;
+}
+
+#finger.press { filter: brightness(0.7); }
+
+/* =====================================================
+   5. 5 MINS LATER
+   ===================================================== */
+#v-card { background: #000; display: flex; align-items: center; justify-content: center; }
+
+#card-text {
+  margin: 0; color: #f2f2f2; letter-spacing: 0.3em;
+  font-size: clamp(1.6rem, 5vw, 3.2rem);
+}
+
+/* =====================================================
+   6. UNDER THE DOOR
+   ===================================================== */
+#v-crack { background: #020304; }
+
+#cr-door {
+  position: absolute; left: 0; right: 0; top: 0; height: 58vh;
+  background:
+    repeating-linear-gradient(90deg, #17110d 0 14px, #1c150f 14px 30px),
+    linear-gradient(180deg, #120d09, #0b0805);
+  border-bottom: 3px solid #050403;
+}
+
+#cr-strip {
+  position: absolute; left: 6vw; right: 6vw; top: 58vh; height: 9vh; overflow: hidden;
+  background: linear-gradient(180deg, #c9ae7d 0%, #6c5a3a 100%);
+  box-shadow: 0 -2px 24px rgba(255, 220, 150, 0.35);
+}
+
+#cr-strip.flash {
+  background: #fff;
+  box-shadow: 0 0 90px 36px rgba(255, 250, 230, 0.95);
+}
+
+#cr-shadows { position: absolute; inset: 0; }
+
+.shadow-foot {
+  position: absolute; top: 0; height: 100%;
+  background: #000; border-radius: 40% 40% 0 0;
+}
+
+#cr-floor {
+  position: absolute; left: 0; right: 0; top: 67vh; bottom: 0;
+  background: linear-gradient(180deg, #0c1318, #030506);
+}
+
+#cr-flash {
+  position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none;
+}
+
+#boom-layer { position: fixed; inset: 0; z-index: 24; pointer-events: none; }
+
+.boom {
+  position: absolute;
+  font: 900 clamp(2rem, 9vw, 6rem) Impact, 'Arial Black', sans-serif;
+  color: #ffe9a8;
+  text-shadow: 0 0 20px #ff7a1a, 0 0 40px #ff3b00;
+  letter-spacing: 0.05em;
+  animation: boom 0.45s ease-out forwards;
+}
+
+@keyframes boom {
+  0%   { opacity: 1; transform: scale(0.6); }
+  30%  { transform: scale(1.2); }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+/* =====================================================
+   7. WATCHING FROM THE DOORWAY
+   ===================================================== */
+#v-watch { background: linear-gradient(180deg, #05070a, #0a1117 70%); }
+
+#w-ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 26vh;
+  background: linear-gradient(180deg, #141d26, #06080b);
+  border-top: 2px solid #22303c;
+}
+
+#w-table {
+  position: absolute; left: 60vw; bottom: 26vh; width: 14vw; height: 5vh;
+  background: #34404b; border-top: 3px solid #4f5f6d; transform: rotate(-12deg);
+}
+
+.wfig { bottom: 26vh; height: calc(var(--fig-h) * 0.55); }
+#w-cop1 { left: 28vw; }
+#w-cop2 { left: 34vw; }
+#w-cop3 { left: 40vw; }
+#w-josh { left: 63vw; }
+#w-pilot { left: 68vw; }
+#w-josh svg, #w-pilot svg { transform: scaleX(-1); }
+
+#w-beams { position: absolute; inset: 0; }
+
+.beam {
+  position: absolute; bottom: 31vh; width: 36vw; height: 10vh;
+  background: linear-gradient(90deg, rgba(255, 255, 230, 0.35), transparent);
+  clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
+  transform-origin: 0 50%;
+}
+
+#w-frame {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  border-left: 14vw solid #000; border-right: 14vw solid #000;
+  border-top: 12vh solid #000; border-bottom: 8vh solid #000;
+}
+
+#w-me {
+  left: -6vw; bottom: 0; height: calc(var(--fig-h) * 1.7); z-index: 4;
+  filter: brightness(0.22);
+  transition: left 0.9s ease-out;
+}
+
+#w-me.in { left: 3vw; }
+
+#w-flash {
+  position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 5; pointer-events: none;
+}
+
+.mz {
+  position: absolute; width: 2.6vw; height: 2.6vw; border-radius: 50%; z-index: 2;
+  background: radial-gradient(circle, #fff8c8, #ffb030 50%, transparent 72%);
+}
+
+/* =====================================================
+   8. YOUR EYES
+   ===================================================== */
+#v-eyes svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+#e-flash {
+  position: absolute; inset: 0; background: #fff4d8; opacity: 0; pointer-events: none;
+}
+
+/* =====================================================
+   9. IN THE PUPIL
+   ===================================================== */
+#p-wrap {
+  position: absolute; inset: 0;
+  transform-origin: 50% 50%;
+  transform: scale(1);
+  transition: transform 4.6s cubic-bezier(0.3, 0, 0.5, 1);
+}
+
+#p-wrap.zoom { transform: scale(3.7); }
+#p-wrap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+#rJosh.fall { animation: rfall 0.55s cubic-bezier(0.5, 0, 1, 0.7) forwards; }
+
+@keyframes rfall {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(84deg); }
+}
+
+#p-flash {
+  position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none;
+}
+
+/* =====================================================
+   10. THE ARRESTS
+   ===================================================== */
+#v-arrest { background: linear-gradient(180deg, #05070a 0%, #0b1118 60%, #121a22 100%); }
+
+#a-ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 20vh;
+  background: linear-gradient(180deg, #18222c, #07090c);
+  border-top: 2px solid #25323e;
+}
+
+#a-lights { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+
+#a-red, #a-blue { position: absolute; top: 0; bottom: 0; width: 60%; opacity: 0; }
+#a-red { left: 0; background: radial-gradient(ellipse at 0% 50%, rgba(255, 40, 40, 0.5), transparent 70%); animation: lightA 0.7s steps(1, end) infinite; }
+#a-blue { right: 0; background: radial-gradient(ellipse at 100% 50%, rgba(50, 90, 255, 0.5), transparent 70%); animation: lightB 0.7s steps(1, end) infinite; }
+
+@keyframes lightA { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes lightB { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+
+#a-josh { left: 44vw; bottom: 20vh; transform: translateY(calc(var(--fig-h) * -0.23)) rotate(90deg); }
+#a-cop1 { left: 34vw; bottom: 20vh; }
+#a-cop2 { left: 62vw; bottom: 20vh; }
+#a-pilot { left: 72vw; bottom: 20vh; }
+#a-pilot svg { transform: scaleX(-1); }
+
+/* =====================================================
+   11. THE COLD ROOM
+   ===================================================== */
+#v-bodies { background: #05101a; }
+
+#d-room {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, #07151d 0%, #0f2f3f 55%, #06121a 100%);
+}
+
+#d-shelves {
+  position: absolute; left: 0; right: 0; top: 10vh; height: 50vh;
+  background:
+    repeating-linear-gradient(90deg, rgba(150, 200, 230, 0.07) 0 6px, transparent 6px 14vw),
+    repeating-linear-gradient(180deg, rgba(150, 200, 230, 0.10) 0 4px, transparent 4px 12vh);
+}
+
+#d-floor {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 24vh;
+  background: linear-gradient(180deg, #16313f 0%, #061017 100%);
+  border-top: 2px solid #2d5568;
+}
+
+.sheet {
+  position: absolute; bottom: 20vh;
+  width: calc(var(--fig-h) * 1.5); height: calc(var(--fig-h) * 0.28);
+  background: linear-gradient(180deg, #eef3f6, #b9c4cc);
+  border-radius: 40% 40% 12% 12% / 70% 70% 12% 12%;
+  box-shadow: inset -10px -6px 14px rgba(0, 0, 0, 0.25);
+}
+
+#d-body1 { left: 20vw; }
+#d-body2 { left: 56vw; }
+
+.marker {
+  position: absolute; bottom: 20vh; width: 3.6vh; height: 3.6vh;
+  background: #f2c94c; color: #111; font: bold 0.8rem monospace;
+  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 2px;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+#d-m1 { left: 46vw; }
+#d-m2 { left: 83vw; }
+
+#d-cop { left: 44vw; bottom: 20vh; transform: rotate(10deg); filter: brightness(0.55); }
+
+.dbeam {
+  position: absolute; bottom: 30vh; width: 40vw; height: 12vh; left: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 235, 0.4), transparent);
+  clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
+  transform-origin: 0 50%;
+}
+
+#d-beam1 { transform: rotate(6deg); animation: sweep 2.4s ease-in-out infinite alternate; }
+#d-beam2 { bottom: 26vh; transform: rotate(-4deg); animation: sweep 2.9s ease-in-out infinite alternate-reverse; }
+
+@keyframes sweep {
+  from { transform: rotate(8deg); }
+  to   { transform: rotate(-6deg); }
+}
+
+#d-mist {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(60% 25% at 25% 82%, rgba(190, 225, 245, 0.18), transparent),
+    radial-gradient(55% 22% at 75% 84%, rgba(190, 225, 245, 0.16), transparent);
+}
+
+#d-slab {
+  position: absolute; inset: 0; z-index: 5;
+  background: linear-gradient(90deg, #5a6874, #8a9aa6 50%, #5a6874);
+  transition: transform 1s cubic-bezier(0.6, 0, 0.9, 0.6);
+}
+
+#d-slab.open { transform: translateX(-102%); }
+
+/* =====================================================
+   12. THE NEWS
+   ===================================================== */
+#v-news { background: #0b2540; }
+
+#n-studio {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 70% 30%, rgba(80, 140, 220, 0.4), transparent 60%),
+    linear-gradient(180deg, #123660 0%, #0b2540 100%);
+}
+
+#n-logo {
+  position: absolute; top: 4vh; left: 4vw; padding: 0.3em 0.8em;
+  background: #c8102e; color: #fff; font: bold 1.1rem Arial, sans-serif; letter-spacing: 0.15em;
+}
+
+#n-desk {
+  position: absolute; left: 6vw; bottom: 20vh; width: 56vw; height: 12vh;
+  background: linear-gradient(180deg, #e8edf2, #aeb9c4); z-index: 3;
+  border-top: 4px solid #fff;
+}
+
+#n-anchor { left: 26vw; bottom: calc(20vh + 6vh); height: calc(var(--fig-h) * 1.2); z-index: 2; }
+
+#n-inset {
+  position: absolute; right: 6vw; top: 12vh; width: 24vw; height: 34vh;
+  background: linear-gradient(180deg, #1c2a38, #0b1118);
+  border: 4px solid #e8edf2; overflow: hidden; z-index: 3;
+}
+
+#n-inset-fig { left: 50%; bottom: 0; height: 28vh; transform: translateX(-50%); }
+
+#n-inset-cap {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 0.3em;
+  text-align: center; background: rgba(0, 0, 0, 0.7);
+  color: #fff; font: bold 0.95rem Arial, sans-serif; letter-spacing: 0.15em;
+}
+
+#n-inset.hero { border-color: #f2c94c; box-shadow: 0 0 30px rgba(242, 201, 76, 0.6); }
+
+#n-banner {
+  position: absolute; left: 0; right: 0; bottom: 9vh; height: 7vh; z-index: 4;
+  display: flex; align-items: center;
+  background: linear-gradient(90deg, #08203a, #0e3a66);
+  border-top: 3px solid #fff; color: #fff; font: bold 1.2rem Arial, sans-serif;
+}
+
+.n-tag {
+  height: 100%; padding: 0 1.2em; display: flex; align-items: center;
+  background: #c8102e; letter-spacing: 0.15em; margin-right: 1em;
+}
+
+#n-ticker {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 9vh; z-index: 4;
+  overflow: hidden; display: flex; align-items: center; background: #040e1a;
+}
+
+#n-ticker-text {
+  white-space: nowrap; color: #e8edf2; font: 1.1rem Arial, sans-serif; letter-spacing: 0.06em;
+  animation: ticker 28s linear infinite;
+}
+
+@keyframes ticker {
+  from { transform: translateX(100vw); }
+  to   { transform: translateX(-100%); }
+}
+
+#n-scan {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.14) 0 2px, transparent 2px 4px);
+}
+
+/* =====================================================
+   SUBTITLES, COVER, FINAL TEXT
+   ===================================================== */
+#sub {
+  position: fixed; left: 0; right: 0; bottom: 6vh; z-index: 20;
+  padding: 0 6vw; text-align: center; color: #e8e8e8;
+  font-size: clamp(1.05rem, 2.4vw, 1.6rem); letter-spacing: 0.04em;
+  opacity: 0; transition: opacity 0.2s ease;
+}
+
+#sub.show { opacity: 1; }
+#sub.news { bottom: 21vh; }
+#sub.news #sub-line {
+  background: rgba(0, 0, 0, 0.7); padding: 0.3em 0.7em; box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+#sub-who {
+  margin-right: 0.8em; font-size: 0.62em; letter-spacing: 0.2em; opacity: 0.6;
+}
+
+#cap {
+  position: fixed; left: 0; right: 0; top: 6vh; z-index: 20; text-align: center;
+  color: #f0f0f0; font: bold 0.95rem 'Courier New', monospace; letter-spacing: 0.2em;
+  text-transform: uppercase; opacity: 0; transition: opacity 0.3s ease;
+}
+
+#cap.show { opacity: 1; }
+
+#cover {
+  position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none;
+  z-index: 40; transition: opacity 1.6s ease;
+}
+
+#cover.on { opacity: 1; }
+
+#final {
+  position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
+  padding: 2rem; text-align: center; pointer-events: none;
+}
+
+#final-text {
+  margin: 0; color: #f2d58a; letter-spacing: 0.1em;
+  font-size: clamp(1.7rem, 5.4vw, 3.4rem);
+  text-shadow: 0 0 24px rgba(242, 213, 138, 0.35);
+  opacity: 0; transition: opacity 3s ease;
+}
+
+#final-text.show { opacity: 1; }
+#final-text.hide { opacity: 0; transition: opacity 2s ease; }
