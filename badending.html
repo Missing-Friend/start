@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Missing - The Bad Ending</title>
+  <link rel="stylesheet" href="badending.css" />
+</head>
+<body>
+
+  <!-- Part 1: the hold. You trust Josh. -->
+  <div id="b-hold" class="b-view">
+    <div id="b-hold-ground"></div>
+    <div id="b-door">
+      <div id="b-door-slab"></div>
+    </div>
+    <div id="b-josh" class="b-fig"></div>
+    <div id="b-pilot" class="b-fig"></div>
+    <div id="b-player" class="b-fig"></div>
+  </div>
+
+  <!-- Part 2: inside the freezer -->
+  <div id="b-inside" class="b-view">
+    <div id="b-world">
+      <div id="b-shelves"></div>
+      <div id="b-floor"></div>
+      <div id="b-nate" class="b-lying"></div>
+      <div id="b-me" class="b-lying"></div>
+      <div id="b-aliyah" class="b-lying"></div>
+    </div>
+    <div id="b-bulb"></div>
+    <div id="b-fog"></div>
+  </div>
+
+  <!-- Close-up: Nate -->
+  <div id="b-close-nate" class="b-view b-close">
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="nfade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#e2bb98"/>
+          <stop offset="0.55" stop-color="#bfa08a"/>
+          <stop offset="0.8" stop-color="#1c1a1c"/>
+          <stop offset="1" stop-color="#07101a"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="400" fill="#07101a"/>
+      <!-- shoulders: a black T-shirt -->
+      <path d="M20 400 Q30 305 130 292 L270 292 Q370 305 380 400 Z" fill="#101013"/>
+      <!-- the face fades into shadow below the nose -->
+      <path d="M115 175 C115 90 160 62 200 62 C240 62 285 90 285 175 L285 240 C270 268 240 276 200 276 C160 276 130 268 115 240 Z" fill="url(#nfade)"/>
+      <!-- hair -->
+      <path d="M108 172 C103 82 158 40 200 40 C250 40 297 85 292 172 C282 122 250 92 200 92 C155 92 123 122 108 172 Z" fill="#5b4028"/>
+      <!-- nose -->
+      <path d="M200 160 L192 205 Q200 212 210 205" fill="none" stroke="#8d7060" stroke-width="4" stroke-linecap="round"/>
+      <!-- glasses with a cracked lens -->
+      <g fill="none" stroke="#0e0e10" stroke-width="5">
+        <circle cx="160" cy="170" r="28"/>
+        <circle cx="240" cy="170" r="28"/>
+        <path d="M188 170 H212"/>
+        <path d="M222 150 L238 176 L252 168" stroke-width="2.5" stroke="#9fb4c2"/>
+      </g>
+      <!-- closed eyes -->
+      <path d="M145 172 Q160 182 175 172" fill="none" stroke="#3a2a22" stroke-width="4" stroke-linecap="round"/>
+      <path d="M225 172 Q240 182 255 172" fill="none" stroke="#3a2a22" stroke-width="4" stroke-linecap="round"/>
+      <!-- a jagged shadow where the lower face should be -->
+      <path d="M112 232 L145 214 L172 238 L200 218 L228 240 L256 216 L288 232 L288 300 L112 300 Z" fill="#050a10"/>
+      <!-- frost -->
+      <g fill="#dff2ff" opacity="0.5">
+        <circle cx="140" cy="120" r="2.5"/><circle cx="180" cy="100" r="2"/><circle cx="260" cy="130" r="3"/>
+        <circle cx="215" cy="205" r="2"/><circle cx="170" cy="150" r="1.5"/><circle cx="270" cy="190" r="2.5"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Close-up: Aliyah -->
+  <div id="b-close-aliyah" class="b-view b-close">
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="400" height="400" fill="#07101a"/>
+      <!-- long dark hair -->
+      <path d="M95 190 C80 70 150 30 200 30 C255 30 322 72 305 190 L318 330 L82 330 Z" fill="#1b1210"/>
+      <!-- pink shirt -->
+      <path d="M20 400 Q30 308 130 295 L270 295 Q370 308 380 400 Z" fill="#e86aa0"/>
+      <!-- three dark slashes on the shirt -->
+      <g stroke="#5a0d16" stroke-width="7" stroke-linecap="round" opacity="0.9">
+        <path d="M150 335 L175 372"/>
+        <path d="M200 328 L228 368"/>
+        <path d="M248 340 L268 372"/>
+      </g>
+      <!-- neck and face -->
+      <rect x="170" y="255" width="60" height="50" fill="#b87e54"/>
+      <path d="M120 180 C120 100 160 70 200 70 C240 70 280 100 280 180 C280 240 245 280 200 280 C155 280 120 240 120 180 Z" fill="#c68a5c"/>
+      <!-- fringe -->
+      <path d="M118 175 C115 90 160 60 200 60 C245 60 285 90 282 175 C265 118 238 98 200 98 C165 98 135 118 118 175 Z" fill="#1b1210"/>
+      <!-- glasses -->
+      <g fill="none" stroke="#2a1a14" stroke-width="5">
+        <circle cx="160" cy="175" r="28"/>
+        <circle cx="240" cy="175" r="28"/>
+        <path d="M188 175 H212"/>
+      </g>
+      <!-- closed eyes -->
+      <path d="M145 178 Q160 188 175 178" fill="none" stroke="#2a1a14" stroke-width="4" stroke-linecap="round"/>
+      <path d="M225 178 Q240 188 255 178" fill="none" stroke="#2a1a14" stroke-width="4" stroke-linecap="round"/>
+      <!-- nose and mouth -->
+      <path d="M200 175 L193 212 Q200 218 208 212" fill="none" stroke="#8e5d3a" stroke-width="4" stroke-linecap="round"/>
+      <path d="M180 245 Q200 252 220 245" fill="none" stroke="#7a3a38" stroke-width="5" stroke-linecap="round"/>
+      <!-- frost -->
+      <g fill="#dff2ff" opacity="0.5">
+        <circle cx="135" cy="125" r="2.5"/><circle cx="190" cy="110" r="2"/><circle cx="262" cy="140" r="3"/>
+        <circle cx="215" cy="225" r="2"/><circle cx="160" cy="215" r="1.5"/><circle cx="270" cy="210" r="2.5"/>
+      </g>
+    </svg>
+  </div>
+
+  <div id="b-frost"></div>
+  <div id="b-lid-top"></div>
+  <div id="b-lid-bottom"></div>
+  <div id="b-cover"></div>
+
+  <div id="b-ending">
+    <p id="b-text">The Bad Ending</p>
+  </div>
+
+  <div id="b-black"></div>
+
+  <script src="badending.js"></script>
+</body>
+</html>
