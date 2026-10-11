@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Missing - The True Ending</title>
+  <link rel="stylesheet" href="part6ending.css" />
+</head>
+<body>
+
+  <!-- 1. The hold: you ask to use the bathroom -->
+  <div id="v-hold" class="v">
+    <div id="h-beam"></div>
+    <div id="h-ground"></div>
+    <div id="h-lever"><div id="h-lever-bar"></div></div>
+    <div id="h-table"></div>
+    <div id="h-josh" class="fig"></div>
+    <div id="h-pilot" class="fig"></div>
+    <div id="h-player" class="fig"></div>
+    <div id="h-crate"></div>
+  </div>
+
+  <!-- 2. The sprint to the bathroom door -->
+  <div id="v-corridor" class="v">
+    <div id="c-world">
+      <div id="c-lamps"></div>
+      <div id="c-ground"></div>
+      <div id="c-sign">RESTROOM</div>
+      <div id="c-door"></div>
+      <div id="c-player" class="fig"></div>
+    </div>
+  </div>
+
+  <!-- 3. Inside the bathroom -->
+  <div id="v-bath" class="v">
+    <div id="b-tiles"></div>
+    <div id="b-mirror"></div>
+    <div id="b-sink"></div>
+    <div id="b-stall"></div>
+    <div id="b-floor"></div>
+    <div id="b-batt">BATTERY 3%</div>
+    <div id="b-mover"><div id="b-player" class="fig"></div></div>
+  </div>
+
+  <!-- 4. Dialing 911 -->
+  <div id="v-dial" class="v">
+    <div id="phone">
+      <div id="ph-top"><span id="ph-sos">EMERGENCY SOS</span><span id="ph-batt">3%</span></div>
+      <div id="ph-number"></div>
+      <div id="ph-keys"></div>
+      <div id="ph-call">CALL</div>
+    </div>
+    <div id="finger"></div>
+  </div>
+
+  <!-- 5. Title card -->
+  <div id="v-card" class="v"><p id="card-text">5 MINS LATER</p></div>
+
+  <!-- 6. The crack under the bathroom door -->
+  <div id="v-crack" class="v">
+    <div id="cr-door"></div>
+    <div id="cr-strip"><div id="cr-shadows"></div></div>
+    <div id="cr-floor"></div>
+    <div id="cr-flash"></div>
+  </div>
+
+  <!-- 7. Watching from the doorway -->
+  <div id="v-watch" class="v">
+    <div id="w-ground"></div>
+    <div id="w-table"></div>
+    <div id="w-beams">
+      <div class="beam" style="left: 31vw; transform: rotate(-4deg);"></div>
+      <div class="beam" style="left: 37vw; transform: rotate(3deg);"></div>
+      <div class="beam" style="left: 43vw; transform: rotate(-1deg);"></div>
+    </div>
+    <div id="w-cop1" class="fig wfig"></div>
+    <div id="w-cop2" class="fig wfig"></div>
+    <div id="w-cop3" class="fig wfig"></div>
+    <div id="w-josh" class="fig wfig"></div>
+    <div id="w-pilot" class="fig wfig"></div>
+    <div id="w-frame"></div>
+    <div id="w-me" class="fig"></div>
+    <div id="w-flash"></div>
+  </div>
+
+  <!-- 8. Your eyes -->
+  <div id="v-eyes" class="v">
+    <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <radialGradient id="faceShade" cx="50%" cy="50%" r="70%">
+          <stop offset="0.5" stop-color="#000" stop-opacity="0"/>
+          <stop offset="1" stop-color="#000" stop-opacity="0.8"/>
+        </radialGradient>
+      </defs>
+      <rect width="800" height="450" fill="#e3b58c"/>
+      <path d="M0 0 H800 V140 Q620 70 400 95 Q180 70 0 140 Z" fill="#2f6fd6"/>
+      <path d="M0 0 H800 V108 Q620 50 400 72 Q180 50 0 108 Z" fill="#2a63c2"/>
+      <path d="M150 172 Q260 128 372 166" fill="none" stroke="#3a2a1e" stroke-width="16" stroke-linecap="round"/>
+      <path d="M428 166 Q540 128 650 172" fill="none" stroke="#3a2a1e" stroke-width="16" stroke-linecap="round"/>
+      <path d="M400 190 Q392 290 372 332 Q400 346 428 332 Q408 290 400 190" fill="none" stroke="#b98b66" stroke-width="6" opacity="0.6"/>
+      <!-- left eye -->
+      <ellipse cx="260" cy="252" rx="100" ry="52" fill="#f6f1ea"/>
+      <circle cx="275" cy="252" r="42" fill="#4a6a8a"/>
+      <circle cx="275" cy="252" r="19" fill="#050505"/>
+      <circle id="glintL" cx="262" cy="240" r="8" fill="#fff" opacity="0"/>
+      <path d="M160 252 Q260 188 360 252" fill="none" stroke="#7a553a" stroke-width="8"/>
+      <!-- right eye -->
+      <ellipse cx="540" cy="252" rx="100" ry="52" fill="#f6f1ea"/>
+      <circle cx="525" cy="252" r="42" fill="#4a6a8a"/>
+      <circle cx="525" cy="252" r="19" fill="#050505"/>
+      <circle id="glintR" cx="512" cy="240" r="8" fill="#fff" opacity="0"/>
+      <path d="M440 252 Q540 188 640 252" fill="none" stroke="#7a553a" stroke-width="8"/>
+      <rect width="800" height="450" fill="url(#faceShade)"/>
+    </svg>
+    <div id="e-flash"></div>
+  </div>
+
+  <!-- 9. Inside the pupil -->
+  <div id="v-pupil" class="v">
+    <div id="p-wrap">
+      <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <clipPath id="pupilClip"><circle cx="400" cy="225" r="62"/></clipPath>
+          <radialGradient id="irisGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0.35" stop-color="#3a5a7a"/>
+            <stop offset="0.8" stop-color="#5f86ad"/>
+            <stop offset="1" stop-color="#25384c"/>
+          </radialGradient>
+        </defs>
+        <rect width="800" height="450" fill="#1a1612"/>
+        <path d="M30 225 Q400 -50 770 225 Q400 500 30 225 Z" fill="#f4efe8"/>
+        <circle cx="400" cy="225" r="140" fill="url(#irisGrad)"/>
+        <circle cx="400" cy="225" r="62" fill="#050505"/>
+
+        <!-- what the pupil reflects -->
+        <g clip-path="url(#pupilClip)">
+          <rect x="338" y="163" width="124" height="124" fill="#0a0e14"/>
+          <rect x="346" y="168" width="38" height="92" fill="#fff0c0" opacity="0.45"/>
+          <rect x="338" y="255" width="124" height="32" fill="#18222c"/>
+          <rect x="408" y="243" width="44" height="12" fill="#3a4651"/>
+          <g id="rJosh" style="transform-origin: 428px 255px;">
+            <circle cx="428" cy="214" r="7" fill="#59606b"/>
+            <rect x="420" y="221" width="16" height="23" rx="3" fill="#59606b"/>
+            <rect x="421" y="244" width="6" height="11" fill="#3a4049"/>
+            <rect x="429" y="244" width="6" height="11" fill="#3a4049"/>
+            <rect x="434" y="226" width="14" height="4" fill="#59606b"/>
+          </g>
+          <circle id="rFlash" cx="452" cy="228" r="14" fill="#fff6c0" opacity="0"/>
+          <circle id="rFlash2" cx="352" cy="238" r="12" fill="#fff6c0" opacity="0"/>
+        </g>
+
+        <ellipse cx="368" cy="190" rx="16" ry="10" fill="#fff" opacity="0.75"/>
+        <path d="M30 225 Q400 -50 770 225" fill="none" stroke="#7a553a" stroke-width="10"/>
+      </svg>
+    </div>
+    <div id="p-flash"></div>
+  </div>
+
+  <!-- 10. The arrests -->
+  <div id="v-arrest" class="v">
+    <div id="a-ground"></div>
+    <div id="a-lights"><div id="a-red"></div><div id="a-blue"></div></div>
+    <div id="a-josh" class="fig"></div>
+    <div id="a-cop1" class="fig"></div>
+    <div id="a-pilot" class="fig"></div>
+    <div id="a-cop2" class="fig"></div>
+  </div>
+
+  <!-- 11. The cold room -->
+  <div id="v-bodies" class="v">
+    <div id="d-room">
+      <div id="d-shelves"></div>
+      <div id="d-floor"></div>
+      <div id="d-body1" class="sheet"></div>
+      <div id="d-body2" class="sheet"></div>
+      <div id="d-m1" class="marker">1</div>
+      <div id="d-m2" class="marker">2</div>
+      <div id="d-cop" class="fig"></div>
+      <div id="d-beam1" class="dbeam"></div>
+      <div id="d-beam2" class="dbeam"></div>
+      <div id="d-mist"></div>
+    </div>
+    <div id="d-slab"></div>
+  </div>
+
+  <!-- 12. The news -->
+  <div id="v-news" class="v">
+    <div id="n-studio"></div>
+    <div id="n-logo">CH. 6 NEWS</div>
+    <div id="n-desk"></div>
+    <div id="n-anchor" class="fig"></div>
+    <div id="n-inset">
+      <div id="n-inset-fig" class="fig"></div>
+      <div id="n-inset-cap">PHILIP</div>
+    </div>
+    <div id="n-banner"><span class="n-tag">BREAKING</span><span id="n-head">SHIP KIDNAPPING HOAX EXPOSED, TWO ARRESTED</span></div>
+    <div id="n-ticker"><div id="n-ticker-text">TWO MEN IN CUSTODY AFTER STANDOFF ON ANTARCTIC VESSEL  •  MISSING PERSON REPORT WAS STAGED, POLICE SAY  •  TWO BODIES RECOVERED  •  CALLER CREDITED WITH BREAKING THE CASE  •  </div></div>
+    <div id="n-scan"></div>
+  </div>
+
+  <div id="boom-layer"></div>
+  <div id="sub"><span id="sub-who"></span><span id="sub-line"></span></div>
+  <div id="cap"></div>
+  <div id="cover"></div>
+
+  <div id="final">
+    <p id="final-text">The True Ending</p>
+  </div>
+
+  <script src="part6ending.js"></script>
+</body>
+</html>
