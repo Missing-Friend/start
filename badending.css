@@ -1,0 +1,357 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+body {
+  --fig-h: clamp(130px, 30vh, 240px);
+  --big-h: clamp(150px, 34vh, 290px);
+}
+
+.b-view {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.b-view.show { opacity: 1; }
+
+/* =====================================================
+   PART 1: THE HOLD
+   ===================================================== */
+#b-hold {
+  background: linear-gradient(180deg, #05070a 0%, #0c1218 60%, #151e26 100%);
+  overflow: hidden;
+}
+
+#b-hold.shake { animation: bshake 0.45s linear; }
+
+@keyframes bshake {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-14px, 8px); }
+  40%  { transform: translate(12px, -9px); }
+  60%  { transform: translate(-9px, 6px); }
+  80%  { transform: translate(5px, -3px); }
+  100% { transform: translate(0, 0); }
+}
+
+#b-hold-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16vh;
+  background: linear-gradient(180deg, #18222c 0%, #07090c 100%);
+  border-top: 2px solid #25323e;
+}
+
+/* The freezer door: open at first, then slammed shut */
+#b-door {
+  position: absolute;
+  left: 82vw;
+  bottom: 16vh;
+  width: 13vw;
+  height: calc(var(--fig-h) * 1.45);
+  overflow: hidden;
+  background: linear-gradient(180deg, #0a1c27 0%, #0e2d3d 100%);
+  border: 3px solid #2a3a46;
+  box-shadow: 0 0 60px 10px rgba(130, 200, 240, 0.25);
+}
+
+#b-door-slab {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #5a6874, #8a9aa6 50%, #5a6874);
+  transform: translateX(105%);
+  transition: transform 0.28s cubic-bezier(0.6, 0, 1, 0.8);
+}
+
+#b-door.closed #b-door-slab { transform: translateX(0); }
+
+.b-fig {
+  position: absolute;
+  bottom: 16vh;
+  height: var(--fig-h);
+  aspect-ratio: 60 / 130;
+  transform-origin: 50% 100%;
+}
+
+.b-fig svg {
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+  display: block;
+}
+
+#b-josh { left: 52vw; transition: left 0.8s ease; }
+#b-pilot { left: 74vw; transition: left 0.5s cubic-bezier(0.5, 0, 1, 0.7); }
+#b-josh svg, #b-pilot svg { transform: scaleX(-1); }
+
+#b-player {
+  left: 26vw;
+  transition: left 1.4s linear, transform 0.4s ease-in;
+  z-index: 2;
+}
+
+#b-player.shoved {
+  left: 86vw !important;
+  transform: rotate(22deg);
+  transition: left 0.45s cubic-bezier(0.5, 0, 1, 0.7), transform 0.45s ease-in;
+}
+
+.leg {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+
+.running .la { animation: bswing 0.26s ease-in-out infinite alternate; }
+.running .lb { animation: bswing 0.26s ease-in-out infinite alternate-reverse; }
+
+@keyframes bswing {
+  from { transform: rotate(-27deg); }
+  to   { transform: rotate(27deg); }
+}
+
+/* =====================================================
+   PART 2: INSIDE THE FREEZER
+   ===================================================== */
+#b-inside {
+  background: linear-gradient(180deg, #07151d 0%, #0f2f3f 55%, #06121a 100%);
+  overflow: hidden;
+}
+
+#b-world {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 75%;
+  transition: transform 3s ease-in-out;
+}
+
+#b-world.pan { transform: translateX(14vw) scale(1.12); }
+#b-world.reset { transform: none; }
+#b-world.slump {
+  transform: rotate(-9deg) translateY(7vh) scale(1.05);
+  transition: transform 5s ease-in;
+}
+
+/* Shelves of frosted boxes */
+#b-shelves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10vh;
+  height: 50vh;
+  background:
+    repeating-linear-gradient(90deg, rgba(150, 200, 230, 0.07) 0 6px, transparent 6px 14vw),
+    repeating-linear-gradient(180deg, rgba(150, 200, 230, 0.10) 0 4px, transparent 4px 12vh);
+}
+
+#b-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22vh;
+  background: linear-gradient(180deg, #16313f 0%, #061017 100%);
+  border-top: 2px solid #2d5568;
+}
+
+.b-lying {
+  position: absolute;
+  bottom: 22vh;
+  height: var(--big-h);
+  aspect-ratio: 60 / 130;
+  transform-origin: 50% 100%;
+  filter: saturate(0.7) brightness(0.85);
+}
+
+.b-lying svg {
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+  display: block;
+}
+
+/* Heads point away from the middle. translateY lifts them out of the floor. */
+#b-nate   { left: 30vw; transform: translateY(calc(var(--big-h) * -0.23)) rotate(-90deg); }
+#b-me     { left: 40vw; transform: translateY(calc(var(--big-h) * -0.23)) rotate(90deg); opacity: 0; transition: opacity 2.5s ease; }
+#b-aliyah { left: 96vw; transform: translateY(calc(var(--big-h) * -0.23)) rotate(-90deg); }
+
+#b-me.show { opacity: 1; }
+
+/* One bare bulb, flickering */
+#b-bulb {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 9vh;
+  background: #263540;
+}
+
+#b-bulb::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  border-radius: 50%;
+  background: #eaf6ff;
+  box-shadow: 0 0 60px 20px rgba(190, 230, 255, 0.55);
+  animation: bflicker 3s steps(1, end) infinite;
+}
+
+@keyframes bflicker {
+  0%   { opacity: 1; }
+  30%  { opacity: 0.55; }
+  34%  { opacity: 1; }
+  70%  { opacity: 0.8; }
+  74%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+#b-fog {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 25% at 25% 80%, rgba(190, 225, 245, 0.16), transparent),
+    radial-gradient(55% 22% at 75% 82%, rgba(190, 225, 245, 0.14), transparent);
+  animation: bdrift 9s ease-in-out infinite alternate;
+}
+
+@keyframes bdrift {
+  from { transform: translateX(-3%); }
+  to   { transform: translateX(3%); }
+}
+
+/* A puff of breath in front of you */
+.b-puff {
+  position: absolute;
+  width: 11vw;
+  height: 11vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(235, 248, 255, 0.55), transparent 70%);
+  filter: blur(6px);
+  opacity: 0;
+  animation: bpuff 2.6s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes bpuff {
+  0%   { opacity: 0; transform: translateY(0) scale(0.4); }
+  25%  { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-9vh) scale(1.6); }
+}
+
+/* =====================================================
+   CLOSE-UPS
+   ===================================================== */
+.b-close {
+  background: #07101a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.b-close svg {
+  height: 92vh;
+  width: auto;
+  max-width: 100%;
+}
+
+.b-close.show svg { animation: bzoom 5s ease-out forwards; }
+
+@keyframes bzoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.12); }
+}
+
+/* =====================================================
+   FROST, EYELIDS, COVER, TEXT
+   ===================================================== */
+#b-frost {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(215, 240, 255, 0.55) 80%, rgba(240, 250, 255, 0.92) 100%);
+  transition: opacity 7s ease-in;
+}
+
+#b-frost.on { opacity: 1; }
+
+#b-lid-top, #b-lid-bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 0;
+  background: #000;
+  z-index: 14;
+  pointer-events: none;
+  transition: height 2.6s ease-in;
+}
+
+#b-lid-top { top: 0; }
+#b-lid-bottom { bottom: 0; }
+#b-lid-top.closed, #b-lid-bottom.closed { height: 50.5%; }
+
+#b-cover {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 15;
+  transition: opacity 0.9s ease;
+}
+
+#b-cover.on { opacity: 1; }
+#b-cover.instant { transition: none; }
+
+#b-ending {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+#b-text {
+  margin: 0;
+  color: #c40000;
+  font-size: clamp(1.6rem, 5vw, 3rem);
+  letter-spacing: 0.08em;
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+
+#b-text.show { opacity: 1; }
+#b-text.hide { opacity: 0; transition: opacity 2s ease; }
+
+#b-black {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 40;
+  transition: opacity 2s ease;
+}
+
+#b-black.on { opacity: 1; }
