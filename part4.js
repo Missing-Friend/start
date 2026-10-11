@@ -471,6 +471,24 @@
   // =====================================================================
   //  SCENE 4: Three doors (not a this-or-that)
   // =====================================================================
+  // A hidden item in cabin 2: a left-behind photo camera
+  function grabCamera() {
+    setFlags({ hasCamera: true });
+    addInfo('Cabin 2: a left-behind photo camera was wedged under the bunk. You took it.');
+    showResult([
+      'A compact photo camera with a cracked strap, wedged where nobody would think to look. You take it before you can talk yourself out of it.',
+      'The screen still lights up. The first photo is a whiteboard crowded with arrows and dates. You flick to the next one, and stop breathing.',
+      'You switch it off. The battery is almost gone. You tuck it inside your coat and promise yourself you will look at the rest when you are somewhere safe.'
+    ], sceneMemo);
+  }
+
+  function leaveCabin2() {
+    showResult([
+      'You back out into the corridor, and the stripped bunk goes back to being just a bunk.',
+      'The fleck of orange on the next door catches the light.'
+    ], sceneMemo);
+  }
+
   function sceneCabins() {
     clearScreen();
     addText('THE LOWER DECK', 'location-tag');
@@ -489,10 +507,16 @@
         label: 'Cabin 2',
         run: () => {
           addHeat(1);
-          showResult([
-            'Dust, a stripped mattress, a smell like nobody has breathed here in years. You back out into the corridor.',
-            'The fleck of orange on the next door catches the light.'
-          ], sceneMemo);
+          clearScreen();
+          addText('CABIN 2', 'location-tag');
+          addParagraphs([
+            'Dust, a stripped mattress, a smell like nobody has breathed here in years.',
+            'Under the bunk, wedged against the wall, something small and square catches the light.'
+          ]);
+          addChoices([
+            { label: 'Reach under the bunk.', run: grabCamera },
+            { label: 'Back out into the corridor.', run: leaveCabin2 }
+          ]);
         }
       },
       {
@@ -624,6 +648,7 @@
       {
         label: 'Wait until he turns away, then slip past.',
         run: () => {
+          setFlags({ slippedCrewman: true });
           showResult([
             'You press into the shadows until he turns to look the other way, then slide past him without a sound.',
             'You never find out what he was about to say.'
