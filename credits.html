@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Missing — Credits</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #000;
+    }
+
+    .scene {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.2s ease;
+    }
+
+    /* ---------- CREDITS ---------- */
+
+    #creditsScene {
+      z-index: 1;
+      opacity: 1;
+      background:
+        radial-gradient(
+          circle at 20% 20%,
+          rgba(255, 255, 255, 0.22),
+          transparent 45%
+        ),
+        radial-gradient(
+          circle at 80% 10%,
+          rgba(173, 232, 255, 0.35),
+          transparent 50%
+        ),
+        linear-gradient(
+          180deg,
+          #021b33 0%,
+          #064a73 35%,
+          #1a7fa8 65%,
+          #9fdcf0 100%
+        );
+    }
+
+    #creditsScene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(
+          circle at 30% 70%,
+          rgba(255, 255, 255, 0.10),
+          transparent 40%
+        ),
+        radial-gradient(
+          circle at 70% 40%,
+          rgba(255, 255, 255, 0.08),
+          transparent 45%
+        );
+      pointer-events: none;
+    }
+
+    .credits-window {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+    }
+
+    .credits {
+      position: absolute;
+      top: 100%;
+      width: min(90vw, 700px);
+      padding: 0 12px;
+      text-align: center;
+      animation: scrollCredits 12s linear forwards;
+    }
+
+    .title {
+      font-size: clamp(3rem, 12vw, 7rem);
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      margin-bottom: 2.5rem;
+      color: #c8b6ff;
+      text-shadow: 0 0 30px rgba(255, 143, 214, 0.25);
+    }
+
+    .credit {
+      margin: 1.4rem 0;
+      font-size: clamp(1.15rem, 3.5vw, 1.8rem);
+      font-weight: 500;
+      color: #d6eaff;
+    }
+
+    @supports ((background-clip: text) or (-webkit-background-clip: text)) {
+      .title {
+        background: linear-gradient(90deg, #ff8fd6, #c8b6ff, #8fd8ff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .credit {
+        background: linear-gradient(90deg, #ffb3e6, #b7e9ff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+    }
+
+    .role {
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    .name {
+      font-weight: 700;
+    }
+
+    .thanks {
+      margin-top: 5rem;
+      padding-bottom: 2rem;
+      font-size: clamp(1.8rem, 6vw, 3.2rem);
+      font-weight: 800;
+      color: #ffe23d;
+      text-shadow: 0 0 25px rgba(255, 226, 61, 0.55);
+      white-space: pre-line;
+    }
+
+    @keyframes scrollCredits {
+      from {
+        transform: translateY(0);
+      }
+      to {
+        transform: translateY(calc(-100% - 100vh));
+      }
+    }
+
+    /* ---------- BLACK / GLITCH ---------- */
+
+    #blackScene {
+      z-index: 2;
+      background: #000;
+      /* Hidden until the credits finish. */
+      opacity: 0;
+    }
+
+    #glitchScene {
+      z-index: 3;
+      background: #000;
+    }
+
+    .missing-text {
+      position: relative;
+      font-size: clamp(3rem, 13vw, 8rem);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: #e9f6ff;
+      opacity: 0;
+    }
+
+    .missing-text.glitch-in {
+      animation: glitchIn 0.7s steps(2, end) forwards;
+    }
+
+    .missing-text.settled {
+      opacity: 1;
+    }
+
+    .missing-text.corrupting {
+      opacity: 1;
+      animation:
+        glitchIn 0.35s steps(2, end) infinite,
+        corruptDrift 0.22s steps(3, end) infinite;
+    }
+
+    .missing-text::before,
+    .missing-text::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .missing-text.glitch-in::before,
+    .missing-text.corrupting::before {
+      color: #ff4fd8;
+      opacity: 0.85;
+      animation: glitchSliceA 0.28s steps(2, end) infinite;
+    }
+
+    .missing-text.glitch-in::after,
+    .missing-text.corrupting::after {
+      color: #4fe8ff;
+      opacity: 0.85;
+      animation: glitchSliceB 0.31s steps(2, end) infinite;
+    }
+
+    @keyframes glitchIn {
+      0% {
+        opacity: 0;
+        transform: translate(-8px, 4px) skewX(12deg);
+      }
+      25% {
+        opacity: 1;
+        transform: translate(6px, -3px) skewX(-10deg);
+      }
+      50% {
+        opacity: 0.25;
+        transform: translate(-4px, 2px);
+      }
+      75% {
+        opacity: 1;
+        transform: translate(3px, -1px) skewX(5deg);
+      }
+      100% {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @keyframes corruptDrift {
+      0% {
+        transform: translate(0, 0) scale(1);
+        filter: none;
+      }
+      33% {
+        transform: translate(-14px, 8px) scale(1.04) skewX(-8deg);
+        filter: blur(1px) contrast(1.3);
+      }
+      66% {
+        transform: translate(18px, -10px) scale(0.97) skewX(10deg);
+        filter: blur(2px) saturate(2);
+      }
+      100% {
+        transform: translate(-6px, 5px) scale(1.02);
+        filter: none;
+      }
+    }
+
+    @keyframes glitchSliceA {
+      0% {
+        clip-path: inset(18% 0 64% 0);
+        transform: translate(-10px, -4px);
+      }
+      50% {
+        clip-path: inset(64% 0 12% 0);
+        transform: translate(12px, 5px);
+      }
+      100% {
+        clip-path: inset(35% 0 45% 0);
+        transform: translate(-6px, 2px);
+      }
+    }
+
+    @keyframes glitchSliceB {
+      0% {
+        clip-path: inset(70% 0 8% 0);
+        transform: translate(10px, 4px);
+      }
+      50% {
+        clip-path: inset(10% 0 75% 0);
+        transform: translate(-12px, -5px);
+      }
+      100% {
+        clip-path: inset(48% 0 32% 0);
+        transform: translate(7px, -2px);
+      }
+    }
+
+    #glitchScene::after {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255, 255, 255, 0.06) 0 2px,
+          transparent 2px 5px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255, 79, 216, 0.08),
+          transparent,
+          rgba(79, 232, 255, 0.08)
+        );
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #glitchScene.corrupted::after {
+      animation: screenNoise 0.18s steps(2, end) infinite;
+    }
+
+    @keyframes screenNoise {
+      0% {
+        opacity: 0.25;
+        transform: translateY(0);
+      }
+      50% {
+        opacity: 0.65;
+        transform: translateY(-8px);
+      }
+      100% {
+        opacity: 0.35;
+        transform: translateY(6px);
+      }
+    }
+
+    /* ---------- TV POWER-OFF ---------- */
+
+    #tvOffScene {
+      z-index: 4;
+      background: transparent;
+      opacity: 0;
+      transition: none;
+    }
+
+    .tv-screen {
+      position: absolute;
+      inset: 0;
+      background: #e9f6ff;
+      box-shadow: 0 0 50px #bfe9ff;
+      transform-origin: center;
+    }
+
+    #tvOffScene.turning-off {
+      opacity: 1;
+    }
+
+    #tvOffScene.turning-off .tv-screen {
+      animation: tvOff 0.65s cubic-bezier(0.8, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes tvOff {
+      0% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      45% {
+        transform: scaleY(0.06);
+        opacity: 1;
+      }
+      70% {
+        transform: scaleY(0.005) scaleX(0.75);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.001);
+        opacity: 0;
+      }
+    }
+
+    /* ---------- SEQUEL ---------- */
+
+    #sequelScene {
+      z-index: 5;
+      background: #000;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .sequel-title {
+      font-size: clamp(3rem, 11vw, 7rem);
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      color: #fff;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .sequel-date {
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      color: #bfe9ff;
+      letter-spacing: 0.35em;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 1s ease 0.35s, transform 1s ease 0.35s;
+    }
+
+    #sequelScene.show .sequel-title,
+    #sequelScene.show .sequel-date {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .credits {
+        animation-duration: 20s;
+      }
+
+      .missing-text.glitch-in,
+      .missing-text.corrupting {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+
+      .missing-text::before,
+      .missing-text::after,
+      #glitchScene.corrupted::after {
+        display: none;
+      }
+
+      #tvOffScene.turning-off .tv-screen {
+        animation: none;
+        opacity: 0;
+      }
+
+      .sequel-title,
+      .sequel-date {
+        transform: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="scene" id="creditsScene">
+    <div class="credits-window">
+      <div class="credits" id="credits">
+        <h1 class="title">Missing</h1>
+
+        <p class="credit">
+          <span class="role">Story:</span>
+          <span class="name">Nick Blackledge</span>
+        </p>
+
+        <p class="credit">
+          <span class="role">Coding:</span>
+          <span class="name">Nick Blackledge</span>
+        </p>
+
+        <p class="credit">
+          <span class="role">Thoughts into this:</span>
+          <span class="name">Nick Blackledge</span>
+        </p>
+
+        <p class="credit">
+          <span class="role">Literally Everything:</span>
+          <span class="name">Nick Blackledge</span>
+        </p>
+
+        <p class="thanks">And...&#10;Thank YOU For Playing</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="blackScene" aria-hidden="true"></section>
+
+  <section class="scene" id="glitchScene">
+    <h1 class="missing-text" id="missingText" data-text="Missing...">
+      Missing...
+    </h1>
+  </section>
+
+  <section class="scene" id="tvOffScene" aria-hidden="true">
+    <div class="tv-screen"></div>
+  </section>
+
+  <section class="scene" id="sequelScene">
+    <h1 class="sequel-title">Missing 2</h1>
+    <p class="sequel-date">Coming 2027</p>
+  </section>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const creditsScene = document.getElementById("creditsScene");
+      const credits = document.getElementById("credits");
+      const blackScene = document.getElementById("blackScene");
+      const glitchScene = document.getElementById("glitchScene");
+      const missingText = document.getElementById("missingText");
+      const tvOffScene = document.getElementById("tvOffScene");
+      const sequelScene = document.getElementById("sequelScene");
+
+      const wait = (milliseconds) =>
+        new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+      let endingStarted = false;
+      let fallbackTimer;
+
+      async function playEnding() {
+        // Prevent the animation event and fallback from starting it twice.
+        if (endingStarted) return;
+        endingStarted = true;
+        clearTimeout(fallbackTimer);
+
+        // 1. Fade the credits into black.
+        creditsScene.style.opacity = "0";
+        blackScene.style.opacity = "1";
+
+        await wait(1200);
+        creditsScene.style.display = "none";
+
+        // 2. Brief black pause.
+        await wait(1400);
+
+        // 3. Reveal the glitching title.
+        glitchScene.style.opacity = "1";
+        missingText.classList.add("glitch-in");
+
+        await wait(700);
+
+        missingText.classList.remove("glitch-in");
+        missingText.classList.add("settled");
+
+        // Keep the title visible before corruption starts.
+        await wait(2300);
+
+        // 4. Corrupt the title and screen.
+        missingText.classList.remove("settled");
+        missingText.classList.add("corrupting");
+        glitchScene.classList.add("corrupted");
+
+        await wait(3200);
+
+        // 5. Shut off the TV while the glitch scene is still visible.
+        tvOffScene.classList.add("turning-off");
+
+        await wait(650);
+
+        // Remove the old scene immediately after the shutoff completes.
+        glitchScene.style.transition = "none";
+        glitchScene.style.opacity = "0";
+        glitchScene.style.display = "none";
+        glitchScene.classList.remove("corrupted");
+        missingText.classList.remove("corrupting");
+        tvOffScene.style.display = "none";
+
+        // 6. Pause on black, then reveal the sequel.
+        await wait(1150);
+
+        sequelScene.style.opacity = "1";
+        sequelScene.classList.add("show");
+      }
+
+      credits.addEventListener("animationend", (event) => {
+        if (
+          event.target === credits &&
+          event.animationName === "scrollCredits"
+        ) {
+          playEnding();
+        }
+      });
+
+      // Backup in case the credits animation is canceled or its event is missed.
+      const animationStyle = getComputedStyle(credits);
+
+      function toMilliseconds(value) {
+        const number = parseFloat(value);
+        if (!Number.isFinite(number)) return 0;
+        return value.trim().endsWith("ms") ? number : number * 1000;
+      }
+
+      const duration = toMilliseconds(
+        animationStyle.animationDuration.split(",")[0]
+      );
+
+      const delay = toMilliseconds(
+        animationStyle.animationDelay.split(",")[0]
+      );
+
+      fallbackTimer = setTimeout(
+        playEnding,
+        Math.max(0, duration + delay) + 500
+      );
+    })();
+  </script>
+</body>
+</html>
