@@ -10,6 +10,7 @@
   const SAVE_KEY = 'missing_part6';     // write: results for the endings and credits
   const GOOD_URL = 'goodending.html';   // the lever
   const BAD_URL = 'badending.html';     // you trusted Josh
+  const TRUE_URL = 'part6ending.html';  // the secret True Ending
 
   const SAFE_CODE = '714';              // CHARTER 714
   const RADIO_TARGET = 71.4;            // where the dial has to be
@@ -565,7 +566,7 @@
         showResult([
           'You lay the pieces end to end, and they make a shape you do not want to look at.',
           'A plan. Thirty days long. And every piece of it falls on someone who was there.'
-        ], scenePhone);
+        ], afterTimeline);
         return;
       }
       feedback.textContent = 'That is not how it happened. Something doesn\'t fit. Start again.';
@@ -578,6 +579,71 @@
   // =====================================================================
   //  SCENE 5: Josh's phone (take it or wave it off)
   // =====================================================================
+  // If you found the camera in part 4, you get to look through it now
+  function afterTimeline() {
+    if (state.flags.hasCamera) sceneCamera();
+    else scenePhone();
+  }
+
+  function sceneCamera() {
+    pickSome({
+      tag: 'THE CAMERA',
+      intro: [
+        'There is a weight in your coat that you have almost forgotten: the little camera from cabin 2. Josh is at the end of the hall, peering up the stairwell. You thumb it on.',
+        'The battery is nearly gone. You can open a few photos before it dies.'
+      ],
+      budget: 3,
+      prompt: (n) => `You can open ${n} more photo${n === 1 ? '' : 's'}.`,
+      moreLabel: 'Next photo',
+      doneLabel: 'Switch it off',
+      items: [
+        {
+          id: 'list',
+          label: 'The whiteboard',
+          text: [
+            'A whiteboard crowded with arrows and dates, in the small slanted hand. A column of three names: NATE. ALIYAH. PHILIP.',
+            'The first two are crossed out. The third has an arrow pointing at the words "the cold room".'
+          ],
+          apply: () => addClue('cam_list', 'Camera: a whiteboard with the names NATE and ALIYAH crossed out, and PHILIP with an arrow to "the cold room".')
+        },
+        {
+          id: 'dock',
+          label: 'A photo of the dock',
+          text: [
+            'A dark dock at night, the timestamp 11:51 p.m. Two figures walking toward the camera, smiling, thinking they were about to be given an explanation.',
+            'A shadow in the corner of the frame is holding the camera.'
+          ],
+          apply: () => addClue('cam_dock', 'Camera: a photo of Nate and Aliyah on the dock at 11:51 p.m., taken by someone standing right behind the lens.')
+        },
+        {
+          id: 'cold',
+          label: 'A photo of the cold room',
+          text: [
+            'The cold room, flash on. Two shapes on the floor under the shelves.',
+            'You do not need to look closer. You look closer anyway. Then you wish you had not.'
+          ],
+          apply: () => addClue('cam_cold', 'Camera: a photo of two still shapes on the floor of the cold room.')
+        },
+        {
+          id: 'selfie',
+          label: 'The last photo',
+          text: [
+            'A selfie, taken at arm\'s length. Josh, smiling the warm smile from the park, in the long black coat. Behind him, a freezer door.',
+            'The timestamp is the night before the walk in the park.'
+          ],
+          apply: () => addClue('cam_selfie', 'Camera: a selfie of Josh in the long black coat in front of a freezer door, the night before the park.')
+        }
+      ],
+      onDone: () => {
+        setFlags({ cameraSeen: true });
+        showResult([
+          'The screen goes dark. The camera is dead, but it does not matter. You have seen what you needed to.',
+          'You slip it back inside your coat. It feels heavier than before.'
+        ], scenePhone);
+      }
+    });
+  }
+
   function scenePhone() {
     clearScreen();
     addText('THE PHONE', 'location-tag');
@@ -905,6 +971,10 @@
     const f = state.flags;
     const sus = state.clues.size;
 
+    // The secret ending: slipped past the crewman, took the camera from cabin 2,
+    // left the dark with phone battery to spare, and sent Josh into the vent first.
+    const unlocked = !!(f.slippedCrewman && f.hasCamera && f.phoneAlive && f.decoy);
+
     const reaction =
       sus >= 9
         ? 'You are not surprised. The pieces have been falling into place for an hour, and now the last one clicks, and you only feel tired.'
@@ -928,6 +998,9 @@
       f.noticedLever
         ? 'Behind you, against the wall, is the rusted lever you noticed, and above Josh\'s head, the crate on its chain.'
         : 'Behind you, the wall is only a stride away.',
+      unlocked
+        ? 'Inside your coat, the camera is a dead weight against your ribs. In your pocket, your phone is still warm, with a few percent of battery left. Barely. But left.'
+        : null,
       'Josh holds out his arms. "It is not too late. Come here, Philip. Trust me. One last time."'
     ];
 
@@ -935,7 +1008,7 @@
     addText('THE LAST CHOICE', 'location-tag');
     addParagraphs(lines);
 
-    addChoices([
+    const finalChoices = [
       {
         label: 'Step toward Josh.',
         run: () => {
@@ -956,7 +1029,23 @@
           ], () => fadeAndGo(GOOD_URL));
         }
       }
-    ]);
+    ];
+
+    // The hidden third choice only appears if you did everything right
+    if (unlocked) {
+      finalChoices.push({
+        label: 'Make an excuse.',
+        run: () => {
+          saveProgress({ finalChoice: 'excuse', suspicion: sus });
+          showResult([
+            'Your mouth moves before you decide anything. "Hey... I am so sorry. I really need the bathroom. Real quick."',
+            'Josh\'s smile does not change. That is the scariest part.'
+          ], () => fadeAndGo(TRUE_URL));
+        }
+      });
+    }
+
+    addChoices(finalChoices);
   }
 
   // ---------- Go ----------
