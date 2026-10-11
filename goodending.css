@@ -1,0 +1,314 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+body { --fig-h: clamp(130px, 30vh, 240px); }
+
+/* =====================================================
+   THE HOLD
+   ===================================================== */
+#g-scene {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #05070a 0%, #0c1218 60%, #151e26 100%);
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  overflow: hidden;
+}
+
+#g-scene.visible { opacity: 1; }
+#g-scene.out { opacity: 0; transition: opacity 2s ease; }
+#g-scene.shake { animation: gshake 0.5s linear; }
+
+@keyframes gshake {
+  0%   { transform: translate(0, 0); }
+  15%  { transform: translate(-16px, 10px); }
+  30%  { transform: translate(14px, -12px); }
+  50%  { transform: translate(-10px, 8px); }
+  70%  { transform: translate(7px, -5px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* A steel ceiling beam */
+#g-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4vh;
+  background: linear-gradient(180deg, #1c252e, #10171d);
+  border-bottom: 2px solid #26323d;
+}
+
+#g-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16vh;
+  background: linear-gradient(180deg, #18222c 0%, #07090c 100%);
+  border-top: 2px solid #25323e;
+  z-index: 1;
+}
+
+/* Chain: from the lever, across the ceiling, down to the crate */
+#g-chain-h {
+  position: absolute;
+  left: 7vw;
+  top: 6vh;
+  width: 55vw;
+  height: 4px;
+  background: repeating-linear-gradient(90deg, #7b8594 0 9px, transparent 9px 13px);
+  transition: transform 0.15s ease;
+}
+
+#g-chain-h.jerk { animation: gjerk 0.35s ease-out; }
+
+@keyframes gjerk {
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(8px); }
+  60%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+#g-chain-v {
+  position: absolute;
+  left: calc(62vw - 2px);
+  top: 6vh;
+  width: 4px;
+  height: 5vh;
+  background: repeating-linear-gradient(180deg, #7b8594 0 9px, transparent 9px 13px);
+  transition: opacity 0.2s;
+}
+
+#g-chain-v.snap { opacity: 0; }
+
+/* The lever on the wall */
+#g-lever {
+  position: absolute;
+  left: 5vw;
+  bottom: calc(16vh + 12vh);
+  width: 5vh;
+  height: 5vh;
+  background: #28323c;
+  border: 3px solid #1a232b;
+  border-radius: 6px;
+  z-index: 2;
+}
+
+#g-lever-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  width: 1.3vh;
+  height: 11vh;
+  margin-left: -0.65vh;
+  background: linear-gradient(90deg, #7a4a2d, #b0703f 50%, #6a3f26);
+  border-radius: 40% 40% 20% 20%;
+  transform-origin: 50% 100%;
+  transform: rotate(-32deg);
+  transition: transform 0.4s cubic-bezier(0.5, 0, 0.8, 0.6);
+}
+
+#g-lever.pulled #g-lever-bar { transform: rotate(52deg); }
+
+/* The table */
+#g-table {
+  position: absolute;
+  left: 52vw;
+  bottom: 16vh;
+  width: 22vw;
+  height: calc(var(--fig-h) * 0.4);
+  background: linear-gradient(180deg, #3a4651 0 12%, #1e2830 12% 100%);
+  border-top: 3px solid #526170;
+  z-index: 2;
+}
+
+/* The figures */
+.g-fig {
+  position: absolute;
+  bottom: 16vh;
+  height: var(--fig-h);
+  aspect-ratio: 60 / 130;
+  transform-origin: 50% 100%;
+  z-index: 3;
+}
+
+.g-fig svg {
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+  display: block;
+}
+
+#g-josh { left: 55vw; }
+#g-pilot { left: 64vw; }
+#g-josh svg, #g-pilot svg { transform: scaleX(-1); }
+
+#g-player {
+  left: 28vw;
+  z-index: 4;
+  transition: left 1.1s cubic-bezier(0.4, 0, 0.8, 0.8);
+}
+
+.leg {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+
+.running .la { animation: gswing 0.26s ease-in-out infinite alternate; }
+.running .lb { animation: gswing 0.26s ease-in-out infinite alternate-reverse; }
+
+@keyframes gswing {
+  from { transform: rotate(-27deg); }
+  to   { transform: rotate(27deg); }
+}
+
+/* The crate over the table */
+#g-crate {
+  position: absolute;
+  left: 47vw;
+  top: 11vh;
+  width: 30vw;
+  height: 36vh;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.28) 0 3px, transparent 3px 46px),
+    linear-gradient(180deg, #7b5a37 0%, #5d4128 100%);
+  border: 4px solid #3a2815;
+  box-shadow: inset 0 0 0 10px rgba(0, 0, 0, 0.12), 0 12px 30px rgba(0, 0, 0, 0.6);
+  z-index: 6;
+  transform-origin: 50% 0;
+}
+
+#g-crate.sway { animation: gsway 0.9s ease-in-out infinite alternate; }
+
+@keyframes gsway {
+  from { transform: rotate(-1.4deg); }
+  to   { transform: rotate(1.4deg); }
+}
+
+#g-crate.drop {
+  top: 48vh;
+  transition: top 0.45s cubic-bezier(0.6, 0, 1, 0.6);
+}
+
+/* Dust thrown up when the crate lands */
+#g-dust {
+  position: absolute;
+  left: 62vw;
+  bottom: 14vh;
+  width: 46vw;
+  height: 16vh;
+  margin-left: -23vw;
+  background: radial-gradient(ellipse at 50% 80%, rgba(180, 190, 200, 0.55), transparent 70%);
+  opacity: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+#g-dust.puff { animation: gdust 2.2s ease-out forwards; }
+
+@keyframes gdust {
+  0%   { opacity: 0.9; transform: scale(0.6); }
+  100% { opacity: 0; transform: scale(1.5) translateY(-4vh); }
+}
+
+/* Spilling out from under the crate */
+#g-puddle {
+  position: absolute;
+  left: 62vw;
+  bottom: 14.6vh;
+  width: 0;
+  height: 4.6vh;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at 50% 50%, #8a0f0f 0%, #5c0808 70%, #3a0505 100%);
+  border-radius: 50%;
+  z-index: 5;
+  transition: width 3.4s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+#g-puddle.grow { width: 42vw; }
+
+/* =====================================================
+   SUBTITLE, FLASH, ENDING TEXT
+   ===================================================== */
+#g-sub {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 6vh;
+  z-index: 20;
+  text-align: center;
+  color: #e8e8e8;
+  font-size: clamp(1.1rem, 2.6vw, 1.7rem);
+  letter-spacing: 0.05em;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+#g-sub.show { opacity: 1; }
+
+#g-who {
+  margin-right: 0.8em;
+  font-size: 0.65em;
+  letter-spacing: 0.2em;
+  opacity: 0.6;
+}
+
+#g-flash {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 25;
+}
+
+#g-flash.go { animation: gflash 0.3s ease-out; }
+
+@keyframes gflash {
+  0%   { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+#g-ending {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+#g-text {
+  margin: 0;
+  color: #f2efe4;
+  font-size: clamp(1.6rem, 5vw, 3rem);
+  letter-spacing: 0.08em;
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+
+#g-text.show { opacity: 1; }
+#g-text.hide { opacity: 0; transition: opacity 2s ease; }
+
+#g-black {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 40;
+  transition: opacity 2s ease;
+}
+
+#g-black.on { opacity: 1; }
